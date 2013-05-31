@@ -919,9 +919,6 @@ $( document ).ready( function() {
     setInterval( function() { if( $( '#autoRefreshButton' ).is( ':checked' ) ) { $.publish( 'dashboard/reloadall' ); } }, 1000 * 10 * 1 );
     setTimeout(  setInterval( function() { if( $( '#autoRefreshButton' ).is( ':checked' ) ) { panel.html.cache.cacheImages(); } }, 1000 * 10 * 1), 1000 * 10 * 0.5 );
 
-    // PETICION PARA EVITAR EL DESLOGUEO, NECESARIO EN LA VERSION 1.2-uvigo
-    setInterval( function() { $.get( '/info/me.json' ); }, 1000 * 60 * 1 );
-
         // calendar icon
         $( ".goToCalendar a img" ).hover( function() {
             $( this ).attr( 'src', 'img/calendar2.gif' );
