@@ -11,36 +11,35 @@ AllCatalogs = function( catalogs_object ) {
 };
 
 Catalog = function( catalogObj ) {
-    this._temporal        = {};
+    this._temporal = {};
     
     if ( catalogObj !== undefined && catalogObj[ 'http://purl.org/dc/terms/' ] !== undefined ) {
-        if(typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'creator' ] !== "undefined")
-            this._creator         = catalogObj[ 'http://purl.org/dc/terms/' ][ 'creator' ]   [ 0 ][ 'value' ] || '';
+        if( typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'creator' ] !== "undefined")
+            this._creator = catalogObj[ 'http://purl.org/dc/terms/' ][ 'creator' ][ 0 ][ 'value' ] || '';
         else
             this._creator = '';
 
-        if(typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'identifier' ] !== "undefined")
-            this._identifier      = catalogObj[ 'http://purl.org/dc/terms/' ][ 'identifier' ][ 0 ][ 'value' ] || 0;
+        if( typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'identifier' ] !== "undefined")
+            this._identifier = catalogObj[ 'http://purl.org/dc/terms/' ][ 'identifier' ][ 0 ][ 'value' ] || 0;
         else
             this._identifier = 0;
 
-        if(typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'spatial' ] !== "undefined")
-            this._spatial         = catalogObj[ 'http://purl.org/dc/terms/' ][ 'spatial' ]   [ 0 ][ 'value' ] || '';
+        if( typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'spatial' ] !== "undefined")
+            this._spatial         = catalogObj[ 'http://purl.org/dc/terms/' ][ 'spatial' ][ 0 ][ 'value' ] || '';
         else
             this._spatial = '';
 
-        if(typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'title' ] !== "undefined")
-            this._title           = catalogObj[ 'http://purl.org/dc/terms/' ][ 'title' ]     [ 0 ][ 'value' ] || '';
+        if( typeof catalogObj[ 'http://purl.org/dc/terms/' ][ 'title' ] !== "undefined")
+            this._title = catalogObj[ 'http://purl.org/dc/terms/' ][ 'title' ][ 0 ][ 'value' ] || '';
         else
             this._title = '';
 
         // temporal value, (ej: "start=2013-03-14T10:00:00Z; end=2013-03-14T10:15:00Z; scheme=W3C-DTF;")
-        var myString = catalogObj[ 'http://purl.org/dc/terms/' ][ 'temporal' ]  [ 0 ][ 'value' ] || 0;
+        var myString = catalogObj[ 'http://purl.org/dc/terms/' ][ 'temporal' ][ 0 ][ 'value' ] || 0;
 
-    //    var myRegexp = /^start=(.*);\ end=(.*);\ scheme=(.*);/;
         var myRegexp = /start=(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d\:\d+([+-][0-2]\d:[0-5]\d|Z{0,1}))/;
         var match = myRegexp.exec( myString );
-        if( !match || typeof match[1] === "undefined" ) {
+        if( !match || typeof match[ 1 ] === "undefined" ) {
             result = 0; 
         } else { 
             result = match[ 1 ];
@@ -49,7 +48,7 @@ Catalog = function( catalogObj ) {
 
         var myRegexp = /end=(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d\:\d+([+-][0-2]\d:[0-5]\d|Z{0,1}))/;
         var match = myRegexp.exec( myString );
-        if( !match || typeof match[1] === "undefined" ) {
+        if( !match || typeof match[ 1 ] === "undefined" ) {
             result = 0; 
         } else { 
             result = match[ 1 ];
@@ -66,6 +65,7 @@ Catalog = function( catalogObj ) {
         this._temporal._scheme = match[ 1 ] || 0;
     
     }
+    
    /*
     * GETTERS & SETTERS
     */
@@ -152,8 +152,6 @@ Catalog = function( catalogObj ) {
          return this._title;
      }
    };
-
-
    // END OF GETTERS & SETTERS
 
 }; // END OF Catalog
@@ -165,8 +163,8 @@ function set_agents_colors( agents ) {
    //var colors = ['darkorange', 'blue', 'fuchsia', 'green', 'darkcyan', 'maroon', 'navy', 'olive', 'purple', 'red', 'silver', 'teal', 'MediumVioletRed', 'tomato' ];
    var colors = [ 'Blue',   'CadetBlue', 'Chartreuse',  'Coral', 'CornflowerBlue', 'Crimson', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkGreen', 'DarkKhaki', 'DarkMagenta', 'DarkOliveGreen', 'Darkorange', 'DarkOrchid', 'DarkRed', 'DarkSalmon', 'DarkSeaGreen', 'DarkSlateGray', 'DarkTurquoise', 'DarkViolet', 'DeepPink', 'DeepSkyBlue', 'DimGray', 'DimGrey', 'DodgerBlue', 'FloralWhite', 'ForestGreen', 'Fuchsia', 'Gold', 'GoldenRod', 'Gray', 'Green', 'HotPink', 'IndianRed ', 'Indigo  ', 'LimeGreen', 'Magenta', 'Maroon', 'MediumAquaMarine', 'MediumBlue', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSlateBlue', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MidnightBlue', 'Navy', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'Peru', 'Pink', 'Plum', 'Purple', 'Red', 'RosyBrown', 'RoyalBlue', 'SaddleBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'Sienna', 'Silver', 'Chocolate', 'SkyBlue', 'SlateBlue', 'SlateGray', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'YellowGreen', 'Brown', 'BlueViolet'];
    color = 100;
-   $.each( agents, function(i, v){
-       agents_color [v.name] = colors[(i%colors.length)];
+   $.each( agents, function( i, v ){
+       agents_color[ v.name ] = colors[ ( i % colors.length ) ];
    });
 }
 
@@ -183,8 +181,8 @@ function search ( params ) {
         jsonp: 'jsonp', 
         jsonpCallback: 'callback1',
         url: "/recordings/recordings.json"  
-    }).done(function (data) {
-        all_catalogs = new AllCatalogs( data['catalogs'] ); // return all the catalogs
+    }).done( function( data ) {
+        all_catalogs = new AllCatalogs( data[ 'catalogs' ] ); // return all the catalogs
         filter_by_agents();
     });
 }
@@ -199,8 +197,8 @@ function print_html_agents( agents ) {
         html_draggable_agent = html_draggable_agent + '<li><div class="external-event">' + v.name + '</div></li>'; 
     });
     
-    $('#list_filter_agents').append(html_agent);
-    $('#list_draggable_agents').append(html_draggable_agent);
+    $( '#list_filter_agents' ).append( html_agent );
+    $( '#list_draggable_agents' ).append( html_draggable_agent );
 }
 
 function filter_by_agents () {
@@ -217,9 +215,7 @@ function addEventsToCalendar( catalog ) {
         allDay  :   false,
         start   :   catalog.start(),
         end     :   catalog.end(),
-        //url:      'scheduler.html?eventId=' + catalog.identifier() + '&edit=true',
-        
-        color   :   agents_color[catalog.spatial()]
+        color   :   agents_color[ catalog.spatial() ]
     };
     
     // disable past events
@@ -248,7 +244,7 @@ function get_searched_catalogs ( catalogs ) {
         return $( this ).val();
     });
     
-    var catalogs_to_show = $.grep( catalogs, function ( n, i ){ return ($.inArray(n.spatial(), ids_enabled_agents)>-1);});
+    var catalogs_to_show = $.grep( catalogs, function ( n, i ){ return ( $.inArray( n.spatial(), ids_enabled_agents ) > -1 ); } );
     return catalogs_to_show;
 }
 
@@ -263,15 +259,15 @@ function init() {
             jsonpCallback: 'callback3',
             url: "/capture-admin/agents.json"    
     }).done( function ( data ) {
-        var agents = process_mh_array_response(data.agents.agent);
+        var agents = process_mh_array_response( data.agents.agent );
         set_agents_colors( agents );
         print_html_agents( agents );
         
         var urlVars = getUrlVars();
-        if( urlVars[ 'agent' ] !== undefined) {
+        if( urlVars[ 'agent' ] !== undefined ) {
             // select agent in the panel
             var selectedAgent = urlVars[ 'agent' ];
-            $('#check_'+selectedAgent).prop( 'checked', true );
+            $( '#check_' + selectedAgent ).prop( 'checked', true );
         } else {
             // select all agents
             $( '#filter input[type=checkbox]' ).prop( 'checked', true );
@@ -287,24 +283,24 @@ function getFirstDay() {
     var firstDay;
     var dateToday;
             
-    if (calendar === undefined || calendar.fullCalendar( 'getDate' ) === undefined) {
+    if ( calendar === undefined || calendar.fullCalendar( 'getDate' ) === undefined ) {
         dateToday= new Date();
     } else {
         dateToday = calendar.fullCalendar( 'getDate' );
     }
 
-    if ( calendarCurrentView === 'agendaDay') {
+    if ( calendarCurrentView === 'agendaDay' ) {
         firstDay = dateToday;
     } else if ( calendarCurrentView === 'agendaWeek') {
         var day = dateToday.getDay();
-        var diff = dateToday.getDate() - day + (day === 0 ? -6:1); // adjust when day is Sunday
+        var diff = dateToday.getDate() - day + ( day === 0 ? -6 : 1 ); // adjust when day is Sunday
         dateToday.setDate( diff );
         firstDay = dateToday;
     } else {    // month view
-        firstDay = new Date(dateToday.getFullYear(), dateToday.getMonth(), 1);
+        firstDay = new Date( dateToday.getFullYear(), dateToday.getMonth(), 1 );
     }
     
-    firstDay.setHours(00,00,00,000);
+    firstDay.setHours( 00, 00, 00, 000 );
     return firstDay;
 }
 
@@ -312,25 +308,24 @@ function getLastDay() {
     var lastDay;
     var dateToday;
             
-    if (calendar === undefined || calendar.fullCalendar( 'getDate' ) === undefined)
-        dateToday= new Date();
-    else{
+    if ( calendar === undefined || calendar.fullCalendar( 'getDate' ) === undefined ) {
+        dateToday = new Date();
+    } else {
         dateToday = calendar.fullCalendar( 'getDate' );
     }
 
     if ( calendarCurrentView === 'agendaDay') {
         lastDay = dateToday;
-    } else if ( calendarCurrentView === 'agendaWeek') {
+    } else if ( calendarCurrentView === 'agendaWeek' ) {
         var day = dateToday.getDay();
-        var diff = dateToday.getDate() - day + (day === 0 ? 0:+7); // adjust when day is Sunday
+        var diff = dateToday.getDate() - day + ( day === 0 ? 0 : +7 ); // adjust when day is Sunday
         dateToday.setDate( diff );
         lastDay = dateToday;
     } else {    // month view
-        lastDay = new Date(dateToday.getFullYear(), dateToday.getMonth() + 1, 0);
+        lastDay = new Date( dateToday.getFullYear(), dateToday.getMonth() + 1, 0 );
     }
-    lastDay.setHours(23,59,59,999);
+    lastDay.setHours( 23, 59, 59, 999 );
     return lastDay;  
-    
 }
 
 
@@ -340,12 +335,12 @@ var firstDay            = getFirstDay();
 var lastDay             = getLastDay();
 
 function init_calendar() {
-   $( ".datepicker" ).datepicker({ dateFormat: 'dd/mm/yy' });
+   $( ".datepicker" ).datepicker( { dateFormat: 'dd/mm/yy' } );
 
-   calendar = $( '#calendar' ).fullCalendar({
+   calendar = $( '#calendar' ).fullCalendar( {
         //defaultView: 'agendaWeek',
         defaultView: calendarDefaultView,
-        viewDisplay: function(view) {
+        viewDisplay: function( view ) {
             calendarCurrentView = view.name;
             firstDay = getFirstDay();
             lastDay = getLastDay();
@@ -366,15 +361,13 @@ function init_calendar() {
   
    });
 
-   calendar.fullCalendar('gotoDate', firstDay);
+   calendar.fullCalendar( 'gotoDate', firstDay );
    view = calendar.fullCalendar( 'getView' );
 
-   $( '#from_date' ).val( ( "0" + view.start.getDate()).slice( -2 ) + "/" + ( "0" + ( view.start.getMonth()+1 )).slice( -2 ) + "/" + view.start.getFullYear());
-   $( '#to_date ').val( ( "0" + view.end.getDate()).slice( -2 ) + "/" + ( "0" + ( view.end.getMonth()+1 )).slice( -2 ) + "/" + view.end.getFullYear());
+   $( '#from_date' ).val( ( "0" + view.start.getDate() ).slice( -2 ) + "/" + ( "0" + ( view.start.getMonth() + 1 ) ).slice( -2 ) + "/" + view.start.getFullYear() );
+   $( '#to_date ').val( ( "0" + view.end.getDate() ).slice( -2 ) + "/" + ( "0" + ( view.end.getMonth() + 1 ) ).slice( -2 ) + "/" + view.end.getFullYear() );
        
 }
-
-
 
 $( document ).ready( function() {
    $( '#search_input' ).keypress( function( e ){

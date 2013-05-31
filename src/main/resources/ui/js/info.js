@@ -1,11 +1,10 @@
 var agent = {};
 
-function printHtmlAgent( ) {
+function printHtmlAgent() {
     var agentInfo = agent;
-    console.log(agent);
 
     // time
-    var timeAgent = formatSecondsAsTime ( agentInfo [ 'time-since-last-update'] / 1000 );
+    var timeAgent = formatSecondsAsTime( agentInfo [ 'time-since-last-update'] / 1000 );
     
     // state
     var stateAgent = '';
@@ -13,10 +12,10 @@ function printHtmlAgent( ) {
     if ( agent.properties !== undefined ){
         
         // State (check if agent is offline) & time
-        var pollingObject = getObjects ( agent.properties, "key", "capture.agent.state.remote.polling.interval" );
+        var pollingObject = getObjects( agent.properties, "key", "capture.agent.state.remote.polling.interval" );
         if ( pollingObject.length > 0 ) {
             var timeSinceUpdate = parseInt( pollingObject[ 0 ].value );
-            if ( agent['time-since-last-update'] > ( timeSinceUpdate * 1000 )) {
+            if ( agent[ 'time-since-last-update' ] > ( timeSinceUpdate * 1000 ) ) {
                 stateAgent = "offline";
             } else {
                 stateAgent = agent.state;
@@ -24,12 +23,10 @@ function printHtmlAgent( ) {
         }
         
         // FREE HD
-        var freeHdObject = getObjects ( agent.properties, "key", "capture.cleaner.mindiskspace" );
+        var freeHdObject = getObjects( agent.properties, "key", "capture.cleaner.mindiskspace" );
         if ( freeHdObject.length > 0 ) {
             freeHdHtml = ( parseInt( freeHdObject[ 0 ].value ) / 1048576 ) + ' MB';
         }
-        
-        
     }
     
     var logHtml     = '<img class="iconTable" src="resources/iconLog.png" />';
@@ -39,19 +36,19 @@ function printHtmlAgent( ) {
     
     // set next - html
 
-    if ( agent.nextRecording !== undefined) {
+    if ( agent.nextRecording !== undefined ) {
         nextObj = agent.nextRecording;
 
         // temporal
         var myRegexp = /start=(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d\:\d+([+-][0-2]\d:[0-5]\d|Z{0,1}))/;
         var match = myRegexp.exec( nextObj[ 'temporal' ][ 0 ][ 'value' ] );
-        if( !match || typeof match[1] === "undefined" ) {
+        if( !match || typeof match[ 1 ] === "undefined" ) {
             result = 0; 
         } else { 
             result = match[ 1 ];
         }
         var dateObj = fromUTCDateString( match[ 1 ] ) || 0;
-        var startsfrom = ( "0" + dateObj.getDay() ).slice( -2 ) + '/' + ( "0" + (dateObj.getMonth()+1) ).slice( -2 ) + '/' + dateObj.getFullYear() + ' ' + ( "0" + dateObj.getHours() ).slice( -2 ) + ':' + ( "0" + dateObj.getMinutes() ).slice( -2 );     
+        var startsfrom = ( "0" + dateObj.getDay() ).slice( -2 ) + '/' + ( "0" + (dateObj.getMonth() + 1) ).slice( -2 ) + '/' + dateObj.getFullYear() + ' ' + ( "0" + dateObj.getHours() ).slice( -2 ) + ':' + ( "0" + dateObj.getMinutes() ).slice( -2 );     
         nextHtml =   '<span title="' + nextObj[ 'title' ][ 0 ][ 'value' ] + '">' + startsfrom  + '</span>';
     }
 
@@ -70,9 +67,6 @@ function printHtmlAgent( ) {
             '</tr>' +
         '</thead><tbody>';
 
-
-      
-
       infoHtml = infoHtml + 
           '<tr class="' + agentInfo.name + '">'+ 
               '<td class="agent">'    + agentInfo.name    + '</td>' + 
@@ -86,12 +80,11 @@ function printHtmlAgent( ) {
               '<td class="cfg">'      + configHtml        + '</td>' + 
           '</tr>';
 
-     $('#infoAgent').html( infoHtml );
+     $( '#infoAgent' ).html( infoHtml );
 
       // capabilities table
-
-      var deviceNames = getCapabilitiesByDevice ( agentInfo.capabilities, 'key', 'capture.device.names');
-      var devicesAr = deviceNames[0].value.split(',');
+      var deviceNames = getCapabilitiesByDevice( agentInfo.capabilities, 'key', 'capture.device.names');
+      var devicesAr = deviceNames[ 0 ].value.split( ',' );
 
       var devicesArLength = devicesAr.length;
 
@@ -104,19 +97,19 @@ function printHtmlAgent( ) {
           '</tr>' +
           '</thead><tbody>';
 
-      for (var i=0; i<devicesArLength; i++) {
+      for ( var i = 0; i < devicesArLength; i++ ) {
           var oddClass='';
-          if ( i % 2 !== 0) { oddClass = ' odd'; }
-          var capAr = getCapabilitiesByDevice ( agentInfo.capabilities, 'key', 'capture.device.'+devicesAr[i]);
+          if ( i % 2 !== 0 ) { oddClass = ' odd'; }
+          var capAr = getCapabilitiesByDevice( agentInfo.capabilities, 'key', 'capture.device.' + devicesAr[ i ] );
 
           var agentCap = new Array();
-          agentCap[ 'device' ] = devicesAr[i];
+          agentCap[ 'device' ] = devicesAr[ i ];
 
-          $.each( capAr, function(i2,v){
+          $.each( capAr, function( i2, v ){
 
               // property ->> ex: capture.device.A.src -> src
-              var property = v.key.replace('capture.device.'+devicesAr[i]+'.', '');
-              agentCap[property] = v.value;                        
+              var property = v.key.replace( 'capture.device.' + devicesAr[ i ] + '.', '' );
+              agentCap[ property ] = v.value;                        
           });
 
           capabilitiesTableHtml = capabilitiesTableHtml +
@@ -126,21 +119,18 @@ function printHtmlAgent( ) {
                   '<td class="outputfile">'   + agentCap.outputfile + '</td>' +
                   '<td class="src">'          + agentCap.src        + '</td>' + 
               '</tr>';
-
       }
 
       capabilitiesTableHtml = capabilitiesTableHtml + '</tbody></table>';
-      $('#infoCapabilities').html( capabilitiesTableHtml );
-  }             
+      $( '#infoCapabilities' ).html( capabilitiesTableHtml );
+  }
 
-
-
-  loadAgent = function ( name ) { 
-      var actualDate = toISODate(new Date(), 'utc');
+  loadAgent = function( name ) { 
+      var actualDate = toISODate( new Date(), 'utc' );
       $.when( $.ajax( '/capture-admin/agents/' + name + '.json' ), 
               $.ajax( '/capture-admin/agents/' + name + '/configuration.json' ), 
-              $.ajax( '/recordings/recordings.json?spatial=' + name + '&startsfrom=' + actualDate + '&sort=EVENT_START')
-            ).then(function( a1, a2, a3 ){
+              $.ajax( '/recordings/recordings.json?spatial=' + name + '&startsfrom=' + actualDate + '&sort=EVENT_START' )
+            ).then( function( a1, a2, a3 ) {
 
               // first ajax - agent info
               if ( a1[ 1 ] === "success" ) {
@@ -157,7 +147,7 @@ function printHtmlAgent( ) {
               // third ajax - next recording
               if ( a3 [ 1 ] === "success" ) {
                   if ( a3 [ 0 ][ 'catalogs' ].length >0 ) {
-                      var nextObj = a3 [ 0 ] [ 'catalogs' ][ 0 ][ 'http://purl.org/dc/terms/' ];
+                      var nextObj = a3[ 0 ] [ 'catalogs' ][ 0 ][ 'http://purl.org/dc/terms/' ];
                       // save object
                       agent.nextRecording = nextObj;
                   }
@@ -168,16 +158,13 @@ function printHtmlAgent( ) {
   
   function refreshImage( name ) {
       $( '#agentCaptureImage' ).attr( 'src', '/dashboard/rest/agents/' + name + '/snapshot.png');
-      
   }
 
-  $(document).ready(function(){
-
+  $( document ).ready( function() {
       var arParameters = getUrlVars();
       var agentId = arParameters[ 'agent' ];       
       loadAgent ( agentId );
       $( document ).attr( 'title', 'Agent: ' + arParameters.agent );
-
 
       // REFRESH
       $('#refreshButton').click(function(){
@@ -185,7 +172,6 @@ function printHtmlAgent( ) {
           refreshImage ( agentId );
       });
 
-      setInterval(function() { if($('#autoRefreshButton').is(':checked')) { loadAgent ( agentId ); refreshImage( agentId ); }}, 1000 * 10 * 0.5);
-      
+      setInterval( function() { if( $( '#autoRefreshButton' ).is( ':checked' ) ) { loadAgent ( agentId ); refreshImage( agentId ); } }, 1000 * 10 * 0.5 );
       refreshImage ( agentId );
   });

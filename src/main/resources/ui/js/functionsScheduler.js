@@ -34,7 +34,7 @@ EditEvent = function () {
     this._agentProperties;
     this._wfproperties;
     
-    this.get = function ( arg ) {
+    this.get = function( arg ) {
         return function() {
           if ( arguments.length === 1 ) {
             var val = arguments[ 0 ];
@@ -89,36 +89,30 @@ var edit = {
 
 
 edit.loadValues = function() {
-    $.ajax({
+    $.ajax( {
         dataType: "jsonp",
         jsonp: 'jsonp',
         jsonpCallback: 'callback1',
         url: '/recordings/' + edit.old.identifier() + '.json'
-    }).done(function (data) {
+    } ).done(function (data) {
         if( typeof data === "undefined" || typeof data[ 'http://purl.org/dc/terms/' ] === "undefined" ) {
             console.log( "error" );
             return false;
         } else {
             //AGENT PROPERTIES
-            $.ajax({
+            $.ajax( {
                 dataType: "text",
                 jsonpCallback: 'callback2',
                 url: '/recordings/' + edit.old.identifier() + '/agent.properties'
-            }).error(function(data){
-                console.log("error calling", data);
-            }).done(function (data) {
+            } ).error( function( data ) {
+                console.log( "error calling", data );
+            }).done( function( data ) {
                 edit.old.agentProperties( data.split( '\n' ) );
             });  
-            
-            
-            
-            
-            
+
             var eventData = data[ 'http://purl.org/dc/terms/' ];
             edit.loadValuesObject( eventData );
             edit.html.loadValues();
-            
-            
             
             // ISPARTOF - SERIES
             var isPartOf;
@@ -132,87 +126,86 @@ edit.loadValues = function() {
                     jsonp: 'jsonp', 
                     jsonpCallback: 'callback10',
                     url: '/series/' + isPartOfHash + '.json'
-                }).error(function(data2){
-                    console.log("error calling", data2);
-                }).done(function ( data2 ) {
+                }).error( function( data2 ) {
+                    console.log( "error calling", data2 );
+                }).done( function( data2 ) {
                     var isPartOfTitle = data2[ 'http://purl.org/dc/terms/' ][ 'title' ][ 0 ][ 'value' ];
-                    //$( '#isPartOf input[name="isPartOf"]' ).val( isPartOfTitle );
-                    //$( '#isPartOf input[name="isPartOf"]' ).attr( 'id', 'seriesSelect' );
+                    
                     $( '#isPartOf' ).append( '<input type="text" value="' + isPartOfTitle + '" id="seriesSelect" class="value_tag" name="isPartOfTitle" />' );
 
                     var autoCompleteOptions = {
-                        source: function(request, response) {
+                        source: function( request, response ) {
                             $.ajax({
-                                url:  '/series/series.json',
+                                url: '/series/series.json',
                                 data: {
-                                  q: request.term,
-                                  sort: 'TITLE'
+                                    q: request.term,
+                                    sort: 'TITLE'
                                 },
                                 dataType: 'json',
                                 type: 'GET',
-                                success: function(data3) {
-                                  var series_list = [];
-                                  data3 = data3.catalogs;
-                                  $.each(data3, function(){
-                                    series_list.push({
-                                      value: this['http://purl.org/dc/terms/']['title'][0].value,
-                                      id: this['http://purl.org/dc/terms/']['identifier'][0].value
+                                success: function( data3 ) {
+                                    var series_list = [];
+                                    data3 = data3.catalogs;
+                                    $.each( data3, function() {
+                                        series_list.push({
+                                            value: this[ 'http://purl.org/dc/terms/' ][ 'title' ][ 0 ].value,
+                                            id: this[ 'http://purl.org/dc/terms/' ][ 'identifier' ][ 0 ].value
+                                        });
                                     });
-                                  });
-                                  response(series_list);
+                                    response( series_list );
                                 }, 
                                 error: function() {
-                                  ocUtils.log('could not retrieve series_data');
+                                    ocUtils.log( 'could not retrieve series_data' );
                                 }
                             });
                         },
-                        select: function(event, ui){
-                            $('#isPartOf input[name="isPartOf"]').val(ui.item.id);
+                        select: function( event, ui ) {
+                            $( '#isPartOf input[name="isPartOf"]' ).val( ui.item.id );
                         },
                         search: function(){
                             //$('#isPartOf').val('');
                         }
                     };
-                    $('#seriesSelect').autocomplete( autoCompleteOptions );
+                    $( '#seriesSelect' ).autocomplete( autoCompleteOptions );
                 });
 
             } else {
                 $( '#isPartOf' ).append(  '<input type="text" value="" id="seriesSelect" class="value_tag" name="isPartOfTitle" />' );
                 isPartOf = "";
                 var autoCompleteOptions = {
-                        source: function(request, response) {
-                            $.ajax({
-                                url:  '/series/series.json',
-                                data: {
-                                  q: request.term,
-                                  sort: 'TITLE'
-                                },
-                                dataType: 'json',
-                                type: 'GET',
-                                success: function(data4) {
-                                  var series_list = [];
-                                  data4 = data4.catalogs;
-                                  $.each(data4, function(){
+                    source: function( request, response ) {
+                        $.ajax({
+                            url:  '/series/series.json',
+                            data: {
+                                q: request.term,
+                                sort: 'TITLE'
+                            },
+                            dataType: 'json',
+                            type: 'GET',
+                            success: function( data4 ) {
+                                var series_list = [];
+                                data4 = data4.catalogs;
+                                $.each( data4, function() {
                                     series_list.push({
-                                      value: this['http://purl.org/dc/terms/']['title'][0].value,
-                                      id: this['http://purl.org/dc/terms/']['identifier'][0].value
+                                        value: this[ 'http://purl.org/dc/terms/' ][ 'title' ][ 0 ].value,
+                                        id: this[ 'http://purl.org/dc/terms/' ][ 'identifier' ][ 0 ].value
                                     });
-                                  });
-                                  response(series_list);
-                                }, 
-                                error: function() {
-                                  ocUtils.log('could not retrieve series_data');
-                                }
-                            });
-                        },
-                        select: function(event, ui){
-                            $('#isPartOf input[name="isPartOf"]').val(ui.item.id);
-                        },
-                        search: function(){
-                            //$('#isPartOf').val('');
-                        }
-                    };
-                    $('#seriesSelect').autocomplete( autoCompleteOptions );
+                                });
+                                response( series_list );
+                            }, 
+                            error: function() {
+                                ocUtils.log( 'could not retrieve series_data' );
+                            }
+                        });
+                    },
+                    select: function( event, ui ){
+                        $( '#isPartOf input[name="isPartOf"]' ).val( ui.item.id );
+                    },
+                    search: function(){
+                        //$('#isPartOf').val('');
+                    }
+                };
+                $( '#seriesSelect' ).autocomplete( autoCompleteOptions );
             }
             
             
@@ -222,57 +215,51 @@ edit.loadValues = function() {
                 jsonp: 'jsonp', 
                 jsonpCallback: 'callback2',
                 url: '/capture-admin/agents.json'
-            }).error(function(data){
-                console.log("error calling", data);
-            }).done(function (data_agents) {
+            }).error( function( data ) {
+                console.log( "error calling", data );
+            }).done( function( data_agents ) {
                 // agents
-                edit.old.allAgents( process_mh_array_response(data_agents.agents.agent) );
+                edit.old.allAgents( process_mh_array_response( data_agents.agents.agent ) );
 
                 var html_combo_agents = '<select id="comboAgents">';
-                $.each(edit.old.allAgents(), function (i, v) {
-                   var agentName = "";
-                  if( typeof v.name !== "undefined") { agentName = v.name;  } else { agentName = "-"; }
-                  var agentSelected = '';
-                  if ( agentName === edit.old.spatial() ) { agentSelected = ' selected=selected '; }
-                  html_combo_agents = html_combo_agents + '<option ' + agentSelected + ' value="' + agentName + '">' + agentName + '</option>';
-
+                $.each( edit.old.allAgents(), function( i, v ) {
+                    var agentName = "";
+                    if( typeof v.name !== "undefined" ) { agentName = v.name; } else { agentName = "-"; }
+                    var agentSelected = '';
+                    if ( agentName === edit.old.spatial() ) { agentSelected = ' selected=selected '; }
+                    html_combo_agents = html_combo_agents + '<option ' + agentSelected + ' value="' + agentName + '">' + agentName + '</option>';
                 });
 
                 html_combo_agents = html_combo_agents + '</select>';
-                $.when( $('#agents').append(html_combo_agents) ).done(function() {
-
-                    $('#comboAgents').change(); 
-                } 
-                );
-
+                $.when( $( '#agents' ).append( html_combo_agents ) ).done( function() {
+                    $( '#comboAgents' ).change(); 
+                } );
             });
             
-          
-            
+
             // PROCESSING
-            
             $.ajax({
                 dataType: "jsonp",
                 jsonp: 'jsonp', 
                 jsonpCallback: 'callback3',
                 url: '/workflow/definitions.json'
-            }).done(function (data) {
-                edit.old.allProcessing( data['workflow_definitions'] || data['definitions']['definition'] );
+            }).done( function( data ) {
+                edit.old.allProcessing( data[ 'workflow_definitions' ] || data[ 'definitions' ][ 'definition' ] );
                
                 var comboProcessingSelected = 'full'; // default
-                $.each(edit.old.agentProperties(), function(i, v){
-                    if( v.indexOf("org.opencastproject.workflow.definition") !== -1) {
-                        comboProcessingSelected = v.split('org.opencastproject.workflow.definition=')[1];
+                $.each( edit.old.agentProperties(), function( i, v ){
+                    if( v.indexOf( "org.opencastproject.workflow.definition" ) !== -1 ) {
+                        comboProcessingSelected = v.split( 'org.opencastproject.workflow.definition=' )[ 1 ];
                         return false; // found, break the loop
                     }
                 });
 
                 var htmlComboProcessing = '<select id="comboProcessing">';
-                $.each( edit.old.allProcessing(), function (i, v) {
+                $.each( edit.old.allProcessing(), function( i, v ) {
 
-                    if ( v.id === "error") { return; }
+                    if ( v.id === "error" ) { return; }
 
-                    if ( v.tag !== undefined && tags !== undefined && $.isArray( tags )) {
+                    if ( v.tag !== undefined && tags !== undefined && $.isArray( tags ) ) {
                         if( $.inArray( v.tag, tags ) === -1 ) { return; } 
                     }
 
@@ -284,13 +271,9 @@ edit.loadValues = function() {
 
                 $( '#processing ul li' ).append( htmlComboProcessing );
 
-
-                // 
-                // PROCESSING PANEL
-                //var id = $('#comboProcessing').val(); // TODO se elige el por defecto o el que esta seleccionado en la edicion
+                // PROCESSING PANEL default
                 edit.html.showProcessingPanelConfiguration( comboProcessingSelected );
             });
-            
         }        
     });
 };
@@ -306,8 +289,6 @@ edit.loadValuesObject = function( data ) {
             edit.old[ i ]( '' );
         }
     });
-    
-    // TODO -> ISPARTOF
     
     /*
      *  TEMPORAL
@@ -336,8 +317,8 @@ edit.loadValuesObject = function( data ) {
      * RC
      */
     if ( edit.old.abstract() !== '' ){
-        edit.old.rrule( edit.getRRuleFromAbstract( edit.old.abstract() ));
-        edit.old.startRC( edit.getStartDateRRuleFromAbstract( edit.old.abstract() ));
+        edit.old.rrule( edit.getRRuleFromAbstract( edit.old.abstract() ) );
+        edit.old.startRC( edit.getStartDateRRuleFromAbstract( edit.old.abstract() ) );
     }
 };
 
@@ -395,9 +376,9 @@ edit.getObjectFromRRule = function( key ) {
 
 edit.getTimeRegexp = function( myString, str ) {
     var myRegexp;
-    if (str === "start") {
+    if ( str === "start" ) {
        myRegexp = /start=(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d\:\d+([+-][0-2]\d:[0-5]\d|Z))/;
-    } else if (str === "end") {
+    } else if ( str === "end" ) {
        myRegexp = /end=(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d\:\d+([+-][0-2]\d:[0-5]\d|Z))/;
     } else {
        return 0;
@@ -411,19 +392,18 @@ edit.getTimeRegexp = function( myString, str ) {
 edit.createDays = function( repeatObj ) {
     /*
    params = {
-       type        :   'month',                 // day, month o week
+       type        :   'month',                 // day, month or week
        actualDate  :   new Date('2013-03-22'),
-       endDate     :   new Date('2013-04-22'),  // endDate y repetitions son excluyentes
-       repetitions :   5,                       // endDate y repetitions son excluyentes
+       endDate     :   new Date('2013-04-22'),  // endDate and repetitions are exclusive
+       repetitions :   5,                       // endDate and repetitions are exclusive
        interval    :   2,        
-       weekDays    :   [ 1, 3, 4 ]              // sólo para la opcion week
+       weekDays    :   [ 1, 3, 4 ]              // only 'week' option
    };
    */
     
     
     // INICIALIZATION
     var actualDate      = repeatObj.actualDate;
-    // actualDate.setHours(00,00,00,000);
     var interval        = repeatObj.interval;
     var type            = repeatObj.type;
     var isRepetition    = false;
@@ -438,12 +418,11 @@ edit.createDays = function( repeatObj ) {
         isRepetition = true;
     } else {
         endDate = repeatObj.endDate;
-        endDate.setHours(23,59,59,999);
+        endDate.setHours( 23, 59, 59, 999 );
         isRepetition = false;
     }
       
-    
-    if (type === "DAILY") {
+    if ( type === "DAILY" ) {
         //  DAY
         var day = new Date( actualDate );
         if ( isRepetition ) {
@@ -463,10 +442,10 @@ edit.createDays = function( repeatObj ) {
             }
 
         }
-    } else if (type === "WEEKLY") {
+    } else if ( type === "WEEKLY" ) {
         // WEEK
-        if ($(repeatObj.weekDays).length === 0) {
-            console.log("error: incorret number of arguments");
+        if ( $( repeatObj.weekDays ).length === 0 ) {
+            console.log( "error: incorret number of arguments" );
             return;
         }
         arWeekDays = repeatObj.weekDays;  // week days selected
@@ -482,7 +461,7 @@ edit.createDays = function( repeatObj ) {
                 var day = new Date( actualDate );
                 for ( var j=0; j< arWeekDays.length && repActual < repetitions; j++ ){
                     day = new Date( firstWeekDay );
-                    day.setDate( firstWeekDay.getDate() + i*7 + arWeekDays[ j ] );
+                    day.setDate( firstWeekDay.getDate() + i * 7 + arWeekDays[ j ] );
                     if ( day < actualDate ) {
                         continue;
                     } else {
@@ -495,7 +474,7 @@ edit.createDays = function( repeatObj ) {
         } else {
             // DATE LIMIT
             var day = new Date( firstWeekDay );
-            for(var i=0; day <= endDate; i=i+interval ) {   
+            for(var i = 0; day <= endDate; i = i + interval ) {   
                 for (var j=0; j< arWeekDays.length; j++ ){
                     day = new Date( firstWeekDay );
                     day.setDate( firstWeekDay.getDate() + i*7 + arWeekDays[ j ] );
@@ -512,11 +491,11 @@ edit.createDays = function( repeatObj ) {
             }            
 
         }
-    } else if (type === "MONTHLY") {
+    } else if ( type === "MONTHLY" ) {
         // MONTH
         var day = new Date( actualDate );
         if ( isRepetition ) {
-            for( var i=0; i < repetitions; i++ ) {   
+            for( var i = 0; i < repetitions; i++ ) {   
                 newday = new Date ( day );
                 res.push( newday );   
                 day.setMonth( day.getMonth() + interval );
@@ -542,17 +521,16 @@ edit.deleteEvent = function( id, action ) {
     $.ajax({
         type: 'DELETE',
         url: '/recordings/' + id,
-        error:function (xhr, ajaxOptions, thrownError){
-            console.log(xhr);
-            console.log(thrownError);
+        error:function ( xhr, ajaxOptions, thrownError ) {
+            console.log( xhr );
+            console.log( thrownError );
         }  
-    }).done(function (data) {
+    }).done( function( data ) {
         if ( typeof action === 'function' ) {
             action();
         }
    });
 };
-
 
 edit.checkConflicts = function( actionOK, actionNOK, onStart ) {
     var onStartBool = true;
@@ -564,29 +542,29 @@ edit.checkConflicts = function( actionOK, actionNOK, onStart ) {
     }
     
    var isOK = false;
-   var device = $('#comboAgents').val();
-   var dateAsObject = $('#startDateInput').datepicker( 'getDate' ); // add hour?
-   var hourMinutes = $('#startTimeInput').val();
-   var myTime = hourMinutes.split(':');
-   var myTimeMs = (myTime[0] * 60 * 60 * 1000) + (myTime[1] * 60 * 1000); // (hour in ms)
-   dateAsObject.setTime( dateAsObject.getTime() + myTimeMs);
+   var device = $( '#comboAgents' ).val();
+   var dateAsObject = $( '#startDateInput' ).datepicker( 'getDate' ); // add hour?
+   var hourMinutes = $( '#startTimeInput' ).val();
+   var myTime = hourMinutes.split( ':' );
+   var myTimeMs = ( myTime[ 0 ] * 60 * 60 * 1000 ) + ( myTime[ 1 ] * 60 * 1000 ); // (hour in ms)
+   dateAsObject.setTime( dateAsObject.getTime() + myTimeMs );
    var start = dateAsObject.getTime();
   
-   var durationHourMinutes = $('#durationInput').val();
-   var myDuration = durationHourMinutes.split(':');
-   var duration = (myDuration[0] * 60 * 60 * 1000) + (myDuration[1] * 60 * 1000); // (hour in ms)
+   var durationHourMinutes = $( '#durationInput' ).val();
+   var myDuration = durationHourMinutes.split( ':' );
+   var duration = ( myDuration[ 0 ] * 60 * 60 * 1000 ) + ( myDuration[ 1 ] * 60 * 1000); // (hour in ms)
    
    var end = start + duration;
    
     var isSerie = false;
 
-    if ( $('#repeatCheckInput').is(':checked') ) {
+    if ( $( '#repeatCheckInput' ).is( ':checked' ) ) {
         isSerie = true;
     }
 
-    if ($('#conflicts').is(':visible')) {
-        $('#conflicts_list').html(''); // empty
-        $('#conflicts').fadeOut();
+    if ( $( '#conflicts' ).is( ':visible' ) ) {
+         $( '#conflicts_list' ).html( '' ); // empty
+         $( '#conflicts' ).fadeOut();
     }
 
     var dataConflicts = {};
@@ -600,7 +578,7 @@ edit.checkConflicts = function( actionOK, actionNOK, onStart ) {
         }
 
         dataConflicts = {
-            'device'    : $('#comboAgents').val(),
+            'device'    : $( '#comboAgents' ).val(),
             'start'     : start,
             'end'       : endSerie,
             'duration'  : duration,
@@ -623,53 +601,52 @@ edit.checkConflicts = function( actionOK, actionNOK, onStart ) {
         jsonp       : 'jsonp', 
         jsonpCallback : 'callback4',
         url         : '/recordings/conflicts.json'
-    }).always(function (data) { 
+    }).always( function( data ) { 
 
-      if(typeof data === "undefined" || typeof data['catalogs'] === "undefined") {
+      if ( typeof data === "undefined" || typeof data[ 'catalogs' ] === "undefined" ) {
          isOK = true;
       } else {
          isOK = false;
       }
 
-      if (!isOK) {
+      if ( !isOK ) {
          var html_list = "";
          var existsConflicts = false;
-         $.each(data['catalogs'], function(i, v){
+         $.each( data[ 'catalogs' ], function( i, v ) {
 
-            var myId = v['http://purl.org/dc/terms/']['identifier'][0]['value'];
+            var myId = v[ 'http://purl.org/dc/terms/' ][ 'identifier' ][ 0 ][ 'value' ];
 
             if ( myId === edit.old.identifier() ) {
                 return true; 
             } else { 
                 if ( onStartBool && abstract !== undefined && abstract !== "" ) { // the ids of the serie (abstract) will be deleted     
 
-                    var conflictingAbstract = v['http://purl.org/dc/terms/']['abstract'][0]['value'];  
+                    var conflictingAbstract = v[ 'http://purl.org/dc/terms/' ][ 'abstract' ][ 0 ][ 'value' ];  
                     if ( abstract === conflictingAbstract ) {
                         return true;
                     } else {
                         existsConflicts = true;
                     }
-
                 } else {
                     existsConflicts = true; 
                 }  
             }    
 
-            var title = v['http://purl.org/dc/terms/']['title'][0]['value'];
-            var temporal = v['http://purl.org/dc/terms/']['temporal'][0]['value'];
-            html_list = html_list + '<li><span class="conflict_title"><a href="scheduler.html?eventId=' + myId + '&edit=1">' + title + '</a></span><span class="conflict_info">' + parseMsToDate( edit.getTimeRegexp(temporal, 'start') ) + ' - ' + parseMsToDate( edit.getTimeRegexp(temporal, 'end') ) + '</span></li>';
+            var title = v[ 'http://purl.org/dc/terms/' ][ 'title' ][ 0 ][ 'value' ];
+            var temporal = v[ 'http://purl.org/dc/terms/' ][ 'temporal' ][ 0 ][ 'value' ];
+            html_list = html_list + '<li><span class="conflict_title"><a href="scheduler.html?eventId=' + myId + '&edit=1">' + title + '</a></span><span class="conflict_info">' + parseMsToDate( edit.getTimeRegexp(temporal, 'start' ) ) + ' - ' + parseMsToDate( edit.getTimeRegexp( temporal, 'end' ) ) + '</span></li>';
          });
          if ( existsConflicts ) {
-            $('#conflicts_list').html(html_list);
-            $('#conflicts').fadeIn();
+            $( '#conflicts_list' ).html( html_list );
+            $( '#conflicts' ).fadeIn();
             if ( typeof actionNOK === 'function' ) { 
                 actionNOK(); 
                 return;
             }
         } else {
-            if ($('#conflicts').is(':visible')) {
-                $('#conflicts_list').html(''); // empty
-                $('#conflicts').fadeOut();
+            if ( $( '#conflicts' ).is( ':visible' ) ) {
+                 $( '#conflicts_list' ).html( '' ); // empty
+                 $( '#conflicts' ).fadeOut();
             }
             if ( typeof actionOK === 'function' ) {
                 actionOK();
@@ -678,9 +655,9 @@ edit.checkConflicts = function( actionOK, actionNOK, onStart ) {
         }
       } else {
 
-         if ($('#conflicts').is(':visible')) {
-               $('#conflicts_list').html(''); // empty
-               $('#conflicts').fadeOut();
+         if ( $( '#conflicts' ).is( ':visible' ) ) {
+              $( '#conflicts_list' ).html( '' ); // empty
+              $( '#conflicts' ).fadeOut();
          }
          if ( typeof actionOK === 'function' ) {
              actionOK();
@@ -705,7 +682,7 @@ edit.buildKeyRepeatOptions = function( onlyRrule, startDateRC ) {
     
     //agent
     if ( fullKey ) {
-        key = key + $('#comboAgents').val() + '##';
+        key = key + $( '#comboAgents' ).val() + '##';
     }
     
     // TYPE: DAY, WEEK, MONTH
@@ -717,40 +694,38 @@ edit.buildKeyRepeatOptions = function( onlyRrule, startDateRC ) {
         freq = freq + 'MONTHLY;';
     }
     
-    var repeatInterval = parseInt($( '#repeatInterval select' ).val());
+    var repeatInterval = parseInt( $( '#repeatInterval select' ).val() );
     key = key + freq + 'INTERVAL=' + repeatInterval + ';';
     
     // ENDING
-    var endingSelected = $("input[name='repeat_ending']:checked");
+    var endingSelected = $( "input[name='repeat_ending']:checked" );
     var endingLetter = '';
     var endingValue = '';
-    if ($(endingSelected).attr('id') === 'option_num_repetitions'){
+    if ($(endingSelected).attr( 'id' ) === 'option_num_repetitions' ){
         endingLetter = 'COUNT='; // After num repetitions
-        endingValue = parseInt($(endingSelected).next('input[type=text]').val());
+        endingValue = parseInt( $( endingSelected ).next( 'input[type=text]' ).val() );
     } else {
         endingLetter = 'UNTIL='; // On date
-        var endingDate = $('#enddate_repetitions').datepicker('getDate');
+        var endingDate = $( '#enddate_repetitions' ).datepicker( 'getDate' );
         endingDate.setDate( endingDate.getDate() + 1 ); // UNTIL + 1 day
-        endingValue = endingDate.getFullYear() + ("0" + (endingDate.getMonth()+1)).slice(-2) + ( "0" + endingDate.getDate()).slice(-2);    
+        endingValue = endingDate.getFullYear() + ( "0" + ( endingDate.getMonth() + 1 ) ).slice( -2 ) + ( "0" + endingDate.getDate() ).slice( -2 );    
 
     }
     key = key + endingLetter + endingValue;
 
     // DAYS OF THE WEEK
     if ( type === "WEEKLY" ) {
-        var inputDays = $('#repeatDays input[type=checkbox]');
+        var inputDays = $( '#repeatDays input[type=checkbox]' );
         var strDays = "";
-        var c=0;
+        var c = 0;
         var separator = '';
-        $.map( inputDays, function(i, v){ 
+        $.map( inputDays, function( i, v ) { 
             if ( $( i ).is( ':checked' ) ) {
                 if ( c > 0 ) { separator = ','; }
                 strDays =  strDays + separator + $( i ).attr( 'name' ) ;
                 c++;
             }
         });
-        
-        
         key = key + ';BYDAY=' + strDays;
     }
     
@@ -761,7 +736,7 @@ edit.buildKeyRepeatOptions = function( onlyRrule, startDateRC ) {
         } else {
             var fullRrule = edit.old.abstract();
             if( fullRrule === '' ) {
-                var startDateRC = $('#startDateInput').datepicker( 'getDate' );
+                var startDateRC = $( '#startDateInput' ).datepicker( 'getDate' );
                 startRCms = startDateRC.getTime();
             } else {
                 var myRegexp = /.*##START=([0-9]*)_.*/;
@@ -773,7 +748,7 @@ edit.buildKeyRepeatOptions = function( onlyRrule, startDateRC ) {
             }
         }
         
-        key = key + '##START=' + startRCms + '_' + getRandomInt(1,9999); // final fake "hash" (actual time + random number)
+        key = key + '##START=' + startRCms + '_' + getRandomInt( 1, 9999 ); // final fake "hash" (actual time + random number)
     }
     return key;
 };
@@ -783,7 +758,7 @@ edit.buildKeyRepeatOptions = function( onlyRrule, startDateRC ) {
  * HTML
  * 
  */
-edit.html.loadValues = function () {
+edit.html.loadValues = function() {
     var html_ini = '<input type="text" class="value_tag" ';
     var html_fin = ' />';
     var html_ini_hidden = '<input type="hidden" class="value_tag" ';
@@ -802,17 +777,17 @@ edit.html.loadValues = function () {
     $( '#title' )       .append( html_ini + 'value="' + edit.old.title()        + '" name="title" ' + html_fin );
     
     //date
-    var temporal_hours = Math.floor(edit.old.duration() / 3600000);
-    var temporal_minutes = Math.round((edit.old.duration() % 3600) / 60);
-    var temporal_hours_formatted    = ("0" + temporal_hours).slice(-2);
-    var temporal_minutes_formatted  = ("0" + temporal_minutes).slice(-2);
-    $( '#duration input[type=text]' ).val( temporal_hours_formatted +":"+temporal_minutes_formatted );
+    var temporal_hours = Math.floor( edit.old.duration() / 3600000 );
+    var temporal_minutes = Math.round( ( edit.old.duration() % 3600 ) / 60 );
+    var temporal_hours_formatted    = ( "0" + temporal_hours).slice( -2 );
+    var temporal_minutes_formatted  = ( "0" + temporal_minutes).slice( -2 );
+    $( '#duration input[type=text]' ).val( temporal_hours_formatted + ":" + temporal_minutes_formatted );
     
     var temporalStart = new Date( edit.old.startDate() );
-    var temporalStartFormatted = ("0" + temporalStart.getDate()).slice(-2) + "/" + ("0" + (temporalStart.getMonth()+1)).slice(-2) + "/" + temporalStart.getFullYear();
+    var temporalStartFormatted = ( "0" + temporalStart.getDate() ).slice(-2) + "/" + ( "0" + ( temporalStart.getMonth() + 1 ) ).slice( -2 ) + "/" + temporalStart.getFullYear();
     $( '#startDateInput' ).val( temporalStartFormatted );
     
-    var timeFormatted = ("0" + temporalStart.getHours()).slice(-2) + ":" + ("0" + temporalStart.getMinutes()).slice(-2);
+    var timeFormatted = ( "0" + temporalStart.getHours() ).slice( -2 ) + ":" + ( "0" + temporalStart.getMinutes() ).slice( -2 );
     
     $( '#startTimeInput' ).val( timeFormatted );
     
@@ -820,21 +795,21 @@ edit.html.loadValues = function () {
     var abstract;
     if( edit.old.abstract() !== undefined && edit.old.abstract() !== '' ) {
         abstract = edit.old.abstract();
-        $('#repeatCheckInput').prop('checked', 'checked');
-        $('#repeatPanel').css( 'display', 'block' );
+        $( '#repeatCheckInput' ).prop( 'checked', 'checked' );
+        $( '#repeatPanel' ).css( 'display', 'block' );
 
-        $( '#startDateInput' ).val(temporalStartFormatted);
+        $( '#startDateInput' ).val( temporalStartFormatted );
         edit.html.setRepeatOptions( edit.old.abstract() );
 
     } else {
         abstract = "";
-        var tomorrow = $('#startDateInput').datepicker( 'getDate' );
+        var tomorrow = $( '#startDateInput' ).datepicker( 'getDate' );
         
-        tomorrow.setDate( tomorrow.getDate()+1 );
-        var d = ( "0" + tomorrow.getDate()).slice(-2) + '/' + ("0" + (tomorrow.getMonth()+1)).slice(-2) + '/' +  tomorrow.getFullYear();
+        tomorrow.setDate( tomorrow.getDate() + 1 );
+        var d = ( "0" + tomorrow.getDate() ).slice( -2 ) + '/' + ( "0" + ( tomorrow.getMonth() + 1 ) ).slice( -2 ) + '/' + tomorrow.getFullYear();
  
-        $( '#enddate_repetitions').val( d );
-        $( '#num_repetitions').val( 2 );
+        $( '#enddate_repetitions' ).val( d );
+        $( '#num_repetitions' ).val( 2 );
     }
 
     // set RC options
@@ -845,37 +820,37 @@ edit.html.loadValues = function () {
 edit.html.setRepeatOptions = function( key ) {
     var opt = edit.getObjectFromRRule( key );
 
-    $('#repeatType').val( opt.FREQ );
+    $( '#repeatType' ).val( opt.FREQ );
     if ( opt.FREQ === "WEEKLY" ) {
-        $('#repeatDays').slideDown();
-        var weekDaysAr = opt.BYDAY.split(',');
+        $( '#repeatDays' ).slideDown();
+        var weekDaysAr = opt.BYDAY.split( ',' );
         $.each ( weekDaysAr, function( i, v ) {
             $( '#repeatDays input[name=' + v + ']' ).prop( 'checked', true );
-            $( '#repeatDays input[name=' + v + ']' ).parents('.weekDays').addClass( 'active' );
+            $( '#repeatDays input[name=' + v + ']' ).parents( '.weekDays' ).addClass( 'active' );
         });   
     }
-    $('#repeatInterval select').val( opt.INTERVAL );
+    $( '#repeatInterval select' ).val( opt.INTERVAL );
     if ( opt.COUNT !== undefined ){
-        $( '#option_num_repetitions' ).prop( 'checked', true);
-        $( '#option_enddate_repetitions' ).prop( 'checked', false);
+        $( '#option_num_repetitions' ).prop( 'checked', true );
+        $( '#option_enddate_repetitions' ).prop( 'checked', false );
         $( '#num_repetitions' ).val( opt.COUNT );
-        $( '#num_repetitions').prop( 'disabled', false );
-        $( '#enddate_repetitions').prop( 'disabled', true );
+        $( '#num_repetitions' ).prop( 'disabled', false );
+        $( '#enddate_repetitions' ).prop( 'disabled', true );
         
         // the enddate(not used at first) is set to tomorrow
-         var tomorrow = $('#startDateInput').datepicker( 'getDate' );
-        tomorrow.setDate( tomorrow.getDate()+1 );
-        var d = ( "0" + tomorrow.getDate()).slice(-2) + '/' + ("0" + (tomorrow.getMonth()+1)).slice(-2) + '/' +  tomorrow.getFullYear();
-        $( '#enddate_repetitions').val( d );
+         var tomorrow = $( '#startDateInput' ).datepicker( 'getDate' );
+        tomorrow.setDate( tomorrow.getDate() + 1 );
+        var d = ( "0" + tomorrow.getDate() ).slice( -2 ) + '/' + ( "0" + ( tomorrow.getMonth() + 1) ).slice( -2 ) + '/' +  tomorrow.getFullYear();
+        $( '#enddate_repetitions' ).val( d );
         
     } else {
-        $( '#option_num_repetitions' ).prop( 'checked', false);
-        $( '#option_enddate_repetitions' ).prop( 'checked', true);
-        $( '#enddate_repetitions').prop( 'disabled', false );
-        $( '#num_repetitions').prop( 'disabled', true );
+        $( '#option_num_repetitions' ).prop( 'checked', false );
+        $( '#option_enddate_repetitions' ).prop( 'checked', true );
+        $( '#enddate_repetitions' ).prop( 'disabled', false );
+        $( '#num_repetitions' ).prop( 'disabled', true );
         //set date
         if ( opt.UNTIL !== undefined && opt.UNTIL.length > 0 ) {
-            var d = opt.UNTIL.substr(6,2) + '/' + opt.UNTIL.substr(4,2) + '/' + opt.UNTIL.substr(0,4);
+            var d = opt.UNTIL.substr( 6, 2 ) + '/' + opt.UNTIL.substr( 4, 2 ) + '/' + opt.UNTIL.substr( 0, 4 );
         } else {
             d = "Error. Pick a new date.";
         }
@@ -884,98 +859,94 @@ edit.html.setRepeatOptions = function( key ) {
 };
 
 edit.html.showDevicesAgent = function( agentName ){
-   var agentTemp = getObjects(edit.old.allAgents(), 'name', agentName);
-   var htmlComboDevices;
+    var agentTemp = getObjects(edit.old.allAgents(), 'name', agentName);
+    var htmlComboDevices;
 
-   var myDevice = getObjects(agentTemp[ 0 ][ 'capabilities' ][ 'item' ], 'key', 'capture.device.names');
+    var myDevice = getObjects( agentTemp[ 0 ][ 'capabilities' ][ 'item' ], 'key', 'capture.device.names' );
 
-   if (agentTemp[0]['capabilities'] === undefined || agentTemp[0]['capabilities'] === "") {
-     htmlComboDevices = '<ul value="">Agent defaults will be used</ul>';
-   } else {
-    var arDevices = myDevice[ 0 ].value.split(',');
+    if ( agentTemp[ 0 ][ 'capabilities' ] === undefined || agentTemp[ 0 ][ 'capabilities' ] === "") {
+        htmlComboDevices = '<ul value="">Agent defaults will be used</ul>';
+    } else {
+        var arDevices = myDevice[ 0 ].value.split( ',' );
 
-     // create array with active channels
-    var activeChannels;
-    $.each(edit.old.agentProperties(), function(i, v){
-        if( v.indexOf("capture.device.names") !== -1) { 
-            activeChannels = v.split('capture.device.names=')[1].split(',');
-            return false; // found, break the loop
-        }
-    });
+         // create array with active channels
+        var activeChannels;
+        $.each( edit.old.agentProperties(), function( i, v ){
+            if( v.indexOf( "capture.device.names" ) !== -1 ) { 
+                activeChannels = v.split( 'capture.device.names=' )[ 1 ].split( ',' );
+                return false; // found, break the loop
+            }
+        });
     
-     
-     // html
-     htmlComboDevices = '<ul>';
-     var activeStr;
-     for(var i=0; i<arDevices.length; i++) {
-        if( $.inArray( arDevices[i], activeChannels) > -1 ) {
-            activeStr = ' checked=checked ';
-        } else {
-            activeStr = '';
+        // html
+        htmlComboDevices = '<ul>';
+        var activeStr;
+        for( var i = 0; i < arDevices.length; i++ ) {
+            if( $.inArray( arDevices[ i ], activeChannels) > -1 ) {
+                activeStr = ' checked=checked ';
+            } else {
+                activeStr = '';
+            }
+            htmlComboDevices = htmlComboDevices + '<li><input type=checkbox value="' + arDevices[ i ] + '" ' + activeStr + ' />' + arDevices[ i ] + '</li>';
         }
-        htmlComboDevices = htmlComboDevices + '<li><input type=checkbox value="' + arDevices[i] + '" ' + activeStr + ' />' + arDevices[i] + '</li>';
-     }
-     htmlComboDevices = htmlComboDevices + '</ul>';
-   }
-   $('#listDevices').html(htmlComboDevices);
+        htmlComboDevices = htmlComboDevices + '</ul>';
+    }
+    $( '#listDevices' ).html( htmlComboDevices );
 };
 
 edit.html.showProcessingDescription = function( processingId ){
-   var objectProc = getObjects(edit.old.allProcessing(), 'id', processingId);
-   $('#processingDescription').html( objectProc[ 0 ][ 'description' ] ); 
+   var objectProc = getObjects( edit.old.allProcessing(), 'id', processingId );
+   $( '#processingDescription' ).html( objectProc[ 0 ][ 'description' ] ); 
 };
 
 
 edit.html.showProcessingPanelConfiguration = function( id ) {
-   var url_agent_properties = '/workflow/configurationPanel?definitionId=' + id;
-   $.ajax({
-         dataType: 'html',
-           url: url_agent_properties
-       }).done(function(data){
-        $('#processingPanel').html(data);
+    var url_agent_properties = '/workflow/configurationPanel?definitionId=' + id;
+    $.ajax({
+        dataType: 'html',
+        url: url_agent_properties
+    }).done( function( data ){
+        $( '#processingPanel' ).html( data );
 
         // SELECT THE CHECKBOXES ACORDING TO AGENT.PROPERTIES
         var myRegexp = /org.opencastproject.workflow.config.(\w+)=(\w+)/g;
         $.each( edit.old.agentProperties(), function( i, v ) {
             var match = myRegexp.exec( v );
-            if ( match !== null) {               
+            if ( match !== null ) {               
                 if ( match[ 2 ] === "true" ){
-                    $( '#' + match[ 1 ]).prop( 'checked', 'checked');
+                    $( '#' + match[ 1 ] ).prop( 'checked', 'checked');
                 }
             }
-
         });
-       });
+    });
 };
 
 edit.html.getRepeatInfo = function() {
-
     // type of date
     var type = $( '#repeatType' ).val();
     
     // get actual date
     var actualDate = $( '#startDateInput' ).datepicker( 'getDate' );
-    var hourMinutes = $('#startTimeInput').val();
-    var myTime = hourMinutes.split(':');
-    var myTimeMs = ( myTime[0] * 60 * 60 * 1000 ) + ( myTime[1] * 60 * 1000 ); // hora en ms
+    var hourMinutes = $( '#startTimeInput' ).val();
+    var myTime = hourMinutes.split( ':' );
+    var myTimeMs = ( myTime[ 0 ] * 60 * 60 * 1000 ) + ( myTime[ 1 ] * 60 * 1000 ); // hora en ms
     actualDate.setTime( actualDate.getTime() + myTimeMs );
     
-    
     var arDays;
-    if ( $('#repeatCheckInput').is(':checked') ) {
-        var interval = parseInt($( '#repeatInterval select' ).val());
+    if ( $( '#repeatCheckInput' ).is( ':checked' ) ) {
+        var interval = parseInt( $( '#repeatInterval select' ).val() );
     
         // get ending
         var isRepetition = false;
         var repetitions;
         var endDate;
-        var endingSelected = $("input[name='repeat_ending']:checked");
-        if ($(endingSelected).attr('id') === 'option_num_repetitions'){
+        var endingSelected = $( "input[name='repeat_ending']:checked" );
+        if ( $( endingSelected ).attr( 'id' ) === 'option_num_repetitions' ){
             isRepetition = true;
-            repetitions = parseInt($(endingSelected).next('input[type=text]').val());
+            repetitions = parseInt( $( endingSelected ).next( 'input[type=text]' ).val() );
         } else {
             isRepetition = false;
-            endDate = $(endingSelected).next('input[type=text]').datepicker('getDate');
+            endDate = $( endingSelected ).next( 'input[type=text]' ).datepicker( 'getDate' );
         }
 
         var params = {
@@ -984,31 +955,29 @@ edit.html.getRepeatInfo = function() {
             'interval'      :   interval
         };
         if( type === 'WEEKLY' ) {
-            params.weekDays     =   edit.html.getWeekDays();
+            params.weekDays = edit.html.getWeekDays();
         }
         if( isRepetition ) {
-            params.repetitions  = repetitions;
+            params.repetitions = repetitions;
         } else {
-            params.endDate      = endDate;
+            params.endDate = endDate;
         }
 
         arDays = edit.createDays( params );  // generate list of dates
     } else {
         arDays = new Array ( actualDate );
-    
     }
     
-    return arDays;
-    
+    return arDays; 
 };
 
 edit.html.getWeekDays = function() {
     var daysSelected = $( '#repeatDays input[type=checkbox]:checked' );
     var arWeekDays = new Array();
-    $.each(daysSelected, function (i,v){
-        var nombre = $(this).attr('name');
+    $.each(daysSelected, function ( i, v ) {
+        var nombre = $( this ).attr('name');
         var numDay = 0;
-        switch(nombre){
+        switch( nombre ){
             case 'MO':
                 numDay = 0;
                 break;
@@ -1031,167 +1000,151 @@ edit.html.getWeekDays = function() {
                 numDay = 6;
                 break;
             default:
-                console.log('error: weekday option unknown');
+                console.log( 'error: weekday option unknown' );
                 return 0;
                 break;
         }
-        arWeekDays.push(numDay);
-
+        arWeekDays.push( numDay );
     });
     
     return arWeekDays;
-    
 };    
     
 edit.html.createCancelUpdateButtons = function() {
     var returnBtn = '<input id="btn_cancel" type="button" class="rounded" value="Return" name="cancel" />';
-    $('#menu_buttons').append( returnBtn );
+    $( '#menu_buttons' ).append( returnBtn );
 };
      
 
 /*
  * DOCUMENT READY
  */
-
-
 eventId = getUrlVars()[ "eventId" ] || 0;
 edit.old.identifier( eventId );
 edit.loadValues();
     
-    
 $( document ).ready( function () {
+    
+    $( '#agents' ).on( "change", "#comboAgents", function( event ){
+        var agentNameSelected = $( this ).val();
+        edit.html.showDevicesAgent( agentNameSelected );
+        edit.checkConflicts();
+    });
 
-    
-    
-   $( '#agents' ).on( "change", "#comboAgents", function( event ){
-      var agentNameSelected = $( this ).val();
-      edit.html.showDevicesAgent( agentNameSelected );
-      edit.checkConflicts();
-   });
-   
-   $( '#processing' ).on( "change", "#comboProcessing", function( event ){
-      var processingSelected = $( this ).val();
-      edit.html.showProcessingDescription( processingSelected );
-      edit.html.showProcessingPanelConfiguration( processingSelected );
-   });
-   
-   $( '#repeatCheckInput, #repeatInterval select, ' +
-      '#option_num_repetitions, #option_enddate_repetitions, ' + 
-      '#enddate_repetitions' ).click( function(){
-       edit.checkConflicts();
-   });
-   
-   $( ' #num_repetitions' ).change( function(){
-      edit.checkConflicts(); 
-   });
-   
-   $( '#repeatDays input[type=checkbox]' ).click( function() {
-       if ( $( this ).is( ':checked' ) ) {
-           $( this ).parents( '.weekDays' ).addClass( 'active' );
-       } else {
-           $( this ).parents( '.weekDays' ).removeClass( 'active' );
-       }
-       edit.checkConflicts();
-   });
+    $( '#processing' ).on( "change", "#comboProcessing", function( event ){
+        var processingSelected = $( this ).val();
+        edit.html.showProcessingDescription( processingSelected );
+        edit.html.showProcessingPanelConfiguration( processingSelected );
+    });
+
+    $( '#repeatCheckInput, #repeatInterval select, ' +
+       '#option_num_repetitions, #option_enddate_repetitions, ' + 
+       '#enddate_repetitions' ).click( function() {
+        edit.checkConflicts();
+    });
+
+    $( '#num_repetitions' ).change( function() {
+        edit.checkConflicts(); 
+    });
+
+    $( '#repeatDays input[type=checkbox]' ).click( function() {
+        if ( $( this ).is( ':checked' ) ) {
+            $( this ).parents( '.weekDays' ).addClass( 'active' );
+        } else {
+            $( this ).parents( '.weekDays' ).removeClass( 'active' );
+        }
+        edit.checkConflicts();
+    });
  
-      $(' #startDateInput').datepicker({
-         dateFormat: 'dd/mm/yy',
-         controlType: 'select',
-         minDate: new Date(),
-         onClose:   edit.checkConflicts
-         
-      });
-      $(' #enddate_repetitions').datepicker({
-         dateFormat: 'dd/mm/yy',
-         controlType: 'select',
-         minDate: new Date(),
-         onClose: edit.checkConflicts
-         
-      });
-      $(' #startTimeInput').timepicker({
-         controlType: 'select',
-         stepMinute: 5,
-         timeFormat: 'HH:mm',
-         onClose:   edit.checkConflicts
-         
-      });
-
-    
-    $(' #durationInput').timepicker({
-         controlType: 'select',
-         stepMinute: 5,
-         timeFormat: 'HH:mm',
-         onClose:   edit.checkConflicts
+    $( '#startDateInput' ).datepicker({
+        dateFormat: 'dd/mm/yy',
+        controlType: 'select',
+        minDate: new Date(),
+        onClose: edit.checkConflicts
     });
     
-    $('#showAdditionalInfo').click(function() {
-       
-      $('#additionalInfo').slideToggle( function (){
-         $('#showAdditionalInfo').toggleClass('additionalInfoOpened');
-
-      });
+    $( '#enddate_repetitions' ).datepicker({
+        dateFormat: 'dd/mm/yy',
+        controlType: 'select',
+        minDate: new Date(),
+        onClose: edit.checkConflicts 
     });
     
-    $('#titleInfo').click(function(){
-       $('#divInfo').slideToggle( function (){
-         $('#titleInfo').toggleClass('sectionClose');
-       });
+    $( '#startTimeInput' ).timepicker({
+        controlType: 'select',
+        stepMinute: 5,
+        timeFormat: 'HH:mm',
+        onClose: edit.checkConflicts
     });
     
-    $('#titleCaptura').click(function(){
-       $('#divCaptura').slideToggle( function (){
-         $('#titleCaptura').toggleClass('sectionClose');
-       });
+    $( '#durationInput' ).timepicker({
+        controlType: 'select',
+        stepMinute: 5,
+        timeFormat: 'HH:mm',
+        onClose: edit.checkConflicts
     });
     
-    $('#titleProcessing').click(function(){
-       $('#divProcessing').slideToggle( function (){
-         $('#titleProcessing').toggleClass('sectionClose');
-       });
+    $( '#showAdditionalInfo' ).click( function() {
+        $( '#additionalInfo' ).slideToggle( function () {
+            $( '#showAdditionalInfo' ).toggleClass( 'additionalInfoOpened' );
+        });
     });
     
- 
-
-    $("#menu_buttons").on("click", "#btn_cancel", function(e){
+    $( '#titleInfo' ).click(function(){
+        $( '#divInfo') .slideToggle( function() {
+            $( '#titleInfo' ).toggleClass( 'sectionClose' );
+        });
+    });
+    
+    $( '#titleCaptura' ).click( function() {
+        $( '#divCaptura' ).slideToggle( function() {
+            $( '#titleCaptura' ).toggleClass( 'sectionClose' );
+        });
+    });
+    
+    $( '#titleProcessing' ).click(function(){
+        $( '#divProcessing' ).slideToggle( function (){
+            $( '#titleProcessing' ).toggleClass( 'sectionClose' );
+        });
+    });
+    
+    $( '#menu_buttons' ).on( 'click', '#btn_cancel', function( e ) {
         e.preventDefault();
-       window.location.href='calendar.html';
+        window.location.href = 'calendar.html';
     });
     
-    $('#repeatCheckInput').click(function(){
-        $('#repeatPanel').slideToggle();
+    $( '#repeatCheckInput' ).click( function() {
+        $( '#repeatPanel' ).slideToggle();
     });
     
-    $('#repeatType').click(function () { 
-        var valor = $(this).val();
-
-        switch (valor){
+    $( '#repeatType' ).click( function() { 
+        var valor = $( this ).val();
+        switch ( valor ) {
             default:
             case 'DAILY':
-                $('#repeatIntervalText').html('días');
-                $('#repeatDays').fadeOut();
+                $( '#repeatIntervalText' ).html( 'días' );
+                $( '#repeatDays' ).fadeOut();
                 break;
             case 'WEEKLY':
-                $('#repeatIntervalText').html('semanas');
-                $('#repeatDays').slideDown();
+                $( '#repeatIntervalText' ).html( 'semanas' );
+                $( '#repeatDays' ).slideDown();
                 break;
             case 'MONTHLY':
-                $('#repeatIntervalText').html('meses');
-                $('#repeatDays').fadeOut();
+                $( '#repeatIntervalText' ).html( 'meses' );
+                $( '#repeatDays' ).fadeOut();
                 break;
-          
          }
-
          edit.checkConflicts();
      });
      
-     $('#repeatEnd input[name="repeat_ending"]').click(function(){
-         idClicked = $(this).attr('id');
-         if(idClicked === 'option_num_repetitions'){
-             $('#enddate_repetitions').attr('disabled','disabled');
-             $('#num_repetitions').removeAttr('disabled');
+     $( '#repeatEnd input[name="repeat_ending"]' ).click( function() {
+         idClicked = $( this ).attr( 'id' );
+         if( idClicked === 'option_num_repetitions' ) {
+             $( '#enddate_repetitions' ).attr( 'disabled', 'disabled' );
+             $( '#num_repetitions' ).removeAttr( 'disabled' );
          } else {
-            $('#enddate_repetitions').removeAttr('disabled');
-            $('#num_repetitions').attr('disabled','disabled');
+            $( '#enddate_repetitions' ).removeAttr('disabled' );
+            $( '#num_repetitions' ).attr( 'disabled', 'disabled' );
          }
          
      });
