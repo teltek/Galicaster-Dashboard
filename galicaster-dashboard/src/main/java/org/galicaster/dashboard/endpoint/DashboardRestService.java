@@ -2,6 +2,9 @@ package org.galicaster.dashboard.endpoint;
 
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.galicaster.dashboard.DashboardService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -10,16 +13,24 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
 public class DashboardRestService {
   private static final Logger logger = LoggerFactory.getLogger(DashboardRestService.class);
   private DashboardService service;
+
+  private static final String FILE_ATTACHMENT_FIELD_NAME = "snapshot";
 
   protected void activate(ComponentContext cc) {
     logger.info("Galicaster REST Endpoint activated");
@@ -54,6 +65,7 @@ public class DashboardRestService {
 
   @GET
   @Path("agents/{name}/snapshot.png")
+  @Produces("image/png")
   public Response getSnapshot(@PathParam("name") String name) throws IOException {
     try {
       File retFile = service.getSnapshot(name);
@@ -65,5 +77,29 @@ public class DashboardRestService {
       logger.error("Received exception {}: {}", e.getClass().getCanonicalName(), e.getMessage());
       throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @POST
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Path("agents/{name}/snapshot.png")
+  public Response setSnapshot(@PathParam("name") String agentName, @Context HttpServletRequest request) throws IOException {
+    try {
+      if (ServletFileUpload.isMultipartContent(request)) {
+        for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+          FileItemStream item = iter.next();
+          if (FILE_ATTACHMENT_FIELD_NAME.equals(item.getFieldName())) {
+            service.setSnapshot(agentName, item.openStream());
+            return Response.noContent().build();
+          }
+        }
+      }
+
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    } catch (NotFoundException e) {
+      throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+    } catch (Exception e) {
+      logger.error("Received exception {}: {}", e.getClass().getCanonicalName(), e.getMessage());
+      throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+    } 
   }
 }

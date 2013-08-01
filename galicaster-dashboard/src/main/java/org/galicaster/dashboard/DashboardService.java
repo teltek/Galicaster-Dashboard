@@ -4,7 +4,6 @@
 
 package org.galicaster.dashboard;
 
-//import static java.util.Arrays.asList;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -32,6 +32,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,36 +43,77 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * TODO Add description
+ * Monitor the Galicaster capture agents attached to a Matterhorn core
  */
 public class DashboardService {
 
   private static final Logger logger = LoggerFactory.getLogger(DashboardService.class);
   //private static final Set<String> goodStates = new HashSet<String>(asList(new String[]{AgentState.IDLE, AgentState.CAPTURING, AgentState.UPLOADING}));
 
-  /** Maximum time (in milliseconds) that the service will wait for an agent to respond to ping */
-  // TODO: Make this configurable
-  private static final int PING_TIMEOUT = 5000; //ms
+  /** Definition of the different functioning modes for the dashboard */
+  public enum Mode {
+    /** The agents push their preview images by themselves */
+    PUSH,
+    /** The dashboard periodically polls the agents for their preview images, via VNC */
+    PULL;
+  }
 
-  /** Maximum time (in seconds) that the service will wait for the pipeline to take a snapshot */
-  // TODO: Make this configurable
-  private static final int SNAPSHOT_TIMEOUT = 10; //seconds
 
-  /** Time between two subsequent updates of an agent's snapshot */
-  // TODO: Make this configurable
-  private static final long SNAPSHOT_DELAY = 60; //seconds
-
-  /** Maximum number of snapshot extracting threads allowed to run that the same time */ 
-  // TODO: Make this configurable
-  private static final int DEFAULT_MAX_CONCURRENT = 5;
-
-  /** This regular expression matches property names of the form "agent.[name].vnc.password", where
-   * [name] is any agent name, that may not contain dots. The [name] contents are captured in group 1.
+  /**
+   *  PROPERTY NAMES
    */
-  private static final String PASSWORD_REGEXP = "agent\\.([^.]+)\\.vnc\\.password";
+
+  /** Name of the property that indicates the ping timeout when checking if a certain agent is active (in milliseconds) */
+  private static final String PING_TIMEOUT_PROPERTY = "ping.timeout";
+
+  /** Name of the property that indicates the timeout used when taking a screenshot from an agent in pull mode (in seconds) */
+  private static final String SNAPSHOT_TIMEOUT_PROPERTY = "snapshot.timeout";
+
+  /** Name of the property that indicates the period between two subsequent updates of an agent's screenshot */
+  private static final String SNAPSHOT_PERIOD_PROPERTY = "snapshot.period";
+
+  /** Name of the property that indicates the maximum number of snapshot-extracting threads allowed to run at the same time */
+  private static final String MAX_CONCURRENT_PROPERTY = "max.concurrent";
 
   /** Name of the property that indicates the global default VNC password for the agents */
   private static final String DEFAULT_PASSWORD_PROPERTY = "default.vnc.password";
+
+  /** Name of the property that indicates the functioning mode of the dashboard (push or pull) */
+  private static final String MODE_PROPERTY = "mode";
+
+
+  /**
+   *  PROPERTY DEFAULT VALUES & RELATED DEFINITIONS
+   */
+
+  /** Default functioning mode */
+  private static final Mode MODE_DEFAULT = Mode.PUSH;
+
+  /** Maximum time (in milliseconds) that the service will wait for an agent to respond to ping */
+  private static final int PING_TIMEOUT_DEFAULT = 5000; //ms
+
+  /** Maximum time (in seconds) that the service will wait for the pipeline to take a snapshot */
+  private static final int SNAPSHOT_TIMEOUT_DEFAULT = 10; //seconds
+
+  /** Time between two subsequent updates of an agent's snapshot */
+  private static final long SNAPSHOT_PERIOD_DEFAULT = 60; //seconds
+
+  /** Maximum number of snapshot-extracting threads allowed to run that the same time */ 
+  private static final int MAX_CONCURRENT_DEFAULT = 5;
+
+  /** Default to the default VNC password for the agents without a specific one specified in the config file */
+  private static final String DEFAULT_PASSWORD_DEFAULT = "";
+
+
+  /**
+   *  OTHER DEFINITIONS
+   */
+
+
+  /** This regular expression matches property names of the form "agent.[name].vnc.password", where
+   * [name] is any agent name. The [name] contents are captured in group 1.
+   */
+  private static final String PASSWORD_REGEXP = "agent\\.(.+?)\\.vnc\\.password";
 
   /** Collection name in the workspace where the agent pictures are stored */
   private static final String COLLECTION_NAME = "dashboard-files";
@@ -80,7 +122,7 @@ public class DashboardService {
   private static final File tempDir = new File(System.getProperty("java.io.tmpdir"));
 
   /** Contains the VNC passwords specified in the config file */
-  private Properties agentPasswords = new Properties();
+  private Properties agentPasswords;
 
   private ScheduledExecutorService periodicSnapshots;
 
@@ -99,60 +141,139 @@ public class DashboardService {
   /** A reference to the security service */
   private SecurityService securityService;
 
+  /** The working mode of this dashboard */
+  private Mode mode = null;
 
+  /** The number of milliseconds to wait for a ping response before failing */
+  private int pingTimeout;
+
+  /** The number of seconds to wait when taking a screenshot before failing */
+  private int snapshotTimeout;
+
+  /** The number of seconds between two consecutive screenshots from an agent */
+  private long snapshotPeriod;
+
+  /** The max number of concurrent screenshot-taking threads */
+  private int maxConcurrentSnapshots;
+
+
+  @SuppressWarnings("unchecked")
   protected void activate(ComponentContext cc) throws URISyntaxException {
 
-    if (cc != null) {
+    // Initialize the object to hold the agent's properties
+    agentPasswords = new Properties();
+    
+    if ((cc == null) || (cc.getProperties() == null)) {
 
+      mode = MODE_DEFAULT;
+      logger.debug("Setting default functioning mode: {}", mode.toString());
+
+      pingTimeout = PING_TIMEOUT_DEFAULT;
+      logger.debug("Setting default ping timeout: {}", pingTimeout);
+
+      snapshotTimeout = SNAPSHOT_TIMEOUT_DEFAULT;
+      logger.debug("Setting default snapshot timeout: {}", snapshotTimeout);
+
+      snapshotPeriod = SNAPSHOT_PERIOD_DEFAULT;
+      logger.debug("Setting default snapshot period: {}", snapshotPeriod);
+
+      maxConcurrentSnapshots = MAX_CONCURRENT_DEFAULT;
+      logger.debug("Setting default maximum concurrent snapshots: {}", maxConcurrentSnapshots);
+      
+      defaultPassword = DEFAULT_PASSWORD_DEFAULT;
+      logger.debug("Setting default VNC password default: {}", DEFAULT_PASSWORD_DEFAULT);
+
+    } else {
+
+      // Get the component properties
+      Dictionary<String, Object> properties = cc.getProperties();
+
+      // Get the functioning mode.
+      String strMode = (String)properties.get(MODE_PROPERTY);
+      if (strMode != null) {
+        try {
+          mode = Mode.valueOf(strMode.toUpperCase());
+        } catch (IllegalArgumentException iae) {
+          logger.warn("Invalid functioning mode found in configuration file: {}", strMode);
+          mode = MODE_DEFAULT;
+          logger.debug("Setting default functioning mode: {}", mode.toString());
+        }
+      } 
+
+      // Read the properties that control the "snapshot taking" process
+      try {
+        pingTimeout = Integer.parseInt((String)properties.get(PING_TIMEOUT_PROPERTY));          
+      } catch (Exception e) {
+        pingTimeout = PING_TIMEOUT_DEFAULT; 
+      }
+
+      try {
+        snapshotTimeout = Integer.parseInt((String)properties.get(SNAPSHOT_TIMEOUT_PROPERTY));          
+      } catch (Exception e) {
+        pingTimeout = SNAPSHOT_TIMEOUT_DEFAULT; 
+      }
+
+      try {
+        snapshotPeriod = Long.parseLong((String)properties.get(SNAPSHOT_PERIOD_PROPERTY));          
+      } catch (Exception e) {
+        snapshotPeriod = SNAPSHOT_PERIOD_DEFAULT; 
+      }
+
+      try {
+        maxConcurrentSnapshots = Integer.parseInt((String)properties.get(MAX_CONCURRENT_PROPERTY));          
+      } catch (Exception e) {
+        maxConcurrentSnapshots = MAX_CONCURRENT_DEFAULT; 
+      }
+
+      // Get the default VNC password, if it is defined in the config file
+      defaultPassword = (String)properties.get(DEFAULT_PASSWORD_PROPERTY);
+      if (defaultPassword == null)
+        defaultPassword = DEFAULT_PASSWORD_DEFAULT;
+
+      // Get the passwords per agent, if specified in the config file
+      Pattern propertyPattern = Pattern.compile(PASSWORD_REGEXP);
+
+      for (Enumeration<String> keys = properties.keys(); keys.hasMoreElements();) { 
+        String key = keys.nextElement();
+        Matcher match = propertyPattern.matcher(key);
+
+        if (match.matches()) {
+          agentPasswords.setProperty(match.group(1), (String)properties.get(match.group()));
+        }
+      }
+    }
+
+    
+    // If the mode is PULL, set the security information and start the snapshot threads accordingly
+    if (mode == Mode.PULL) {
+      
       // Set security information
       this.systemAccount = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
 
       DefaultOrganization defaultOrg = new DefaultOrganization();
       securityService.setOrganization(defaultOrg);
       securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
+      
+      // Start the threads that take the snapshots
+      periodicSnapshots = Executors.newScheduledThreadPool(maxConcurrentSnapshots);
 
+      Map<String, Agent> knownAgents = captureAgentStateService.getKnownAgents();
+      Random randGen = new Random();
+      for (Map.Entry<String, Agent> entry : knownAgents.entrySet()) {
+        SnapshotWithDeadline task = new SnapshotWithDeadline(entry.getValue(), tempDir,
+                agentPasswords.getProperty(entry.getKey(), defaultPassword), snapshotTimeout, TimeUnit.SECONDS);
 
-      @SuppressWarnings("unchecked")
-      Dictionary<String, String> props = cc.getProperties();
-
-      // Get the default VNC password, if it is defined in the config file
-      defaultPassword = props.get(DEFAULT_PASSWORD_PROPERTY);
-      if (defaultPassword == null)
-        defaultPassword = "";
-
-      // Get the passwords per agent, if specified in the config file
-      Pattern propertyPattern = Pattern.compile(PASSWORD_REGEXP);
-
-
-
-      for (Enumeration<String> keys = props.keys(); keys.hasMoreElements();) { 
-        String key = keys.nextElement();
-        Matcher match = propertyPattern.matcher(key);
-
-        if (match.matches()) {
-          agentPasswords.setProperty(match.group(1), props.get(match.group()));
-        }
+        periodicSnapshots.scheduleAtFixedRate(task, randGen.nextLong() % snapshotPeriod, snapshotPeriod, TimeUnit.SECONDS);
       }
-    } 
-
-
-    periodicSnapshots = Executors.newScheduledThreadPool(DEFAULT_MAX_CONCURRENT);
-
-    Map<String, Agent> knownAgents = captureAgentStateService.getKnownAgents();
-
-    for (Map.Entry<String, Agent> entry : knownAgents.entrySet()) {
-      SnapshotWithDeadline task = new SnapshotWithDeadline(entry.getValue(), tempDir,
-              agentPasswords.getProperty(entry.getKey(), defaultPassword), SNAPSHOT_TIMEOUT, TimeUnit.SECONDS);
-
-      // TODO: Change start time
-      periodicSnapshots.scheduleAtFixedRate(task, 0, SNAPSHOT_DELAY, TimeUnit.SECONDS);
     }
 
     logger.info("Galicaster Service activated");
   }
 
+
   protected void deactivate(ComponentContext cc) {
     periodicSnapshots.shutdownNow();
+    agentPasswords = null;
     logger.info("Galicaster Service deactivated");
   }
 
@@ -198,7 +319,7 @@ public class DashboardService {
       InetAddress addr;
       try {
         addr = InetAddress.getByName(agent.getUrl());
-        boolean isReachable = addr.isReachable(PING_TIMEOUT);
+        boolean isReachable = addr.isReachable(pingTimeout);
         boolean isInGoodState = true;
         //boolean isInGoodState = goodStates.contains(agent.getState());
         logger.error("Agent {} is {}reachable{}.",
@@ -240,6 +361,26 @@ public class DashboardService {
       }
     } else
       throw new NotFoundException("Agent " + agentName + " is not registered in the system");
+  }
+
+
+  public void setSnapshot(String agentName, InputStream fileStream) throws NotFoundException, IOException{
+    Agent agent = captureAgentStateService.getAgentState(agentName);
+
+    if (agent != null) {
+      String fileName = agentName + GstreamerSnapshotTaker.IMAGE_EXTENSION;
+
+      try {
+        workspace.putInCollection(COLLECTION_NAME, fileName, fileStream);
+      } catch (IllegalArgumentException e) {
+        logger.warn("Couldn't create a correct URI with file name '{}' and collection '{}'.", fileName, COLLECTION_NAME);
+        throw new NotFoundException("Couldn't create a correct URI with collection name '" + COLLECTION_NAME + 
+                "' and file name '" + fileName + "'.", e);
+      } catch (IOException ioe) {
+        throw new IOException("Error reading file '" + fileName + "' from collection '" + COLLECTION_NAME + "'", ioe);
+      }
+    } else
+      throw new NotFoundException("Agent " + agentName + " is not registered in the system");   
   }
 
 
