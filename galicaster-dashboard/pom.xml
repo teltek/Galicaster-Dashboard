@@ -9,7 +9,7 @@
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
     <version>1.4-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <matterhorn.basedir>${project.basedir}/..</matterhorn.basedir>
@@ -34,6 +34,14 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
