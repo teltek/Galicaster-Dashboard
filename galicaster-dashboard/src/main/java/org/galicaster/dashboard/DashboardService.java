@@ -313,37 +313,36 @@ public class DashboardService {
    * @throws IOException if a network error occurs
    * @throws NotFoundException if the agent is not registered
    */
-  public boolean isActive(String agentName) {
-    Agent agent = captureAgentStateService.getAgentState(agentName);
-    if (agent != null) {
-      InetAddress addr;
-      try {
-        addr = InetAddress.getByName(agent.getUrl());
-        boolean isReachable = addr.isReachable(pingTimeout);
-        boolean isInGoodState = true;
-        //boolean isInGoodState = goodStates.contains(agent.getState());
-        logger.error("Agent {} is {}reachable{}.",
-                new String[] {
-                agent.getName(),
-                isReachable ? "" : "not ",
-                        ""
-                        //isReachable ? " and reporting state " + agent.getState() : ""
-        });
-
-        return isReachable && isInGoodState;
-      } catch (UnknownHostException e) {
-        // Host does not exist
-      } catch (IOException e) {
-        // A network error occurred, so the agent is unreachable too
-      } 
+  public boolean isActive(String agentName) throws NotFoundException {
+    Agent agent = captureAgentStateService.getAgent(agentName);
+     
+    InetAddress addr;
+    try {
+      addr = InetAddress.getByName(agent.getUrl());
+      boolean isReachable = addr.isReachable(pingTimeout);
+      boolean isInGoodState = true;
+      //boolean isInGoodState = goodStates.contains(agent.getState());
+      logger.error("Agent {} is {}reachable{}.",
+		   new String[] {
+		       agent.getName(),
+		       isReachable ? "" : "not ",
+		       ""
+		       //isReachable ? " and reporting state " + agent.getState() : ""
+		   });
+      
+      return isReachable && isInGoodState;
+    } catch (UnknownHostException e) {
+	// Host does not exist
+    } catch (IOException e) {
+	// A network error occurred, so the agent is unreachable too
     } 
-
+    
     return false;
   }
 
-  public File getSnapshot(String agentName) throws NotFoundException {
 
-    Agent agent = captureAgentStateService.getAgentState(agentName);
+  public File getSnapshot(String agentName) throws NotFoundException {
+    Agent agent = captureAgentStateService.getAgent(agentName);
 
     if (agent != null) {
       String fileName = agentName + GstreamerSnapshotTaker.IMAGE_EXTENSION;
@@ -365,7 +364,7 @@ public class DashboardService {
 
 
   public void setSnapshot(String agentName, InputStream fileStream) throws NotFoundException, IOException{
-    Agent agent = captureAgentStateService.getAgentState(agentName);
+    Agent agent = captureAgentStateService.getAgent(agentName);
 
     if (agent != null) {
       String fileName = agentName + GstreamerSnapshotTaker.IMAGE_EXTENSION;

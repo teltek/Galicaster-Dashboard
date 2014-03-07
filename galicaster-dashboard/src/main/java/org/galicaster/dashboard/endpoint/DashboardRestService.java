@@ -57,10 +57,14 @@ public class DashboardRestService {
   @GET
   @Path("agents/{name}")
   public Response isActive(@PathParam("name") String name) {
+    try {
     if (service.isActive(name))
       return Response.noContent().build();
     else
       throw new WebApplicationException(Response.Status.NOT_FOUND);
+    } catch (NotFoundException e) {
+      throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+    }
   }
 
   @GET
