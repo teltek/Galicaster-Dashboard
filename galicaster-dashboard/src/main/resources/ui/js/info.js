@@ -26,7 +26,7 @@ function printHtmlAgent( ) {
         // FREE HD
         var freeHdObject = getObjects ( agent.properties, "key", "capture.cleaner.mindiskspace" );
         if ( freeHdObject.length > 0 ) {
-            freeHdHtml = ( parseInt( freeHdObject[ 0 ].value ) / 1048576 ) + ' MB';
+            freeHdHtml = humanFileSize( freeHdObject[ 0 ].value );
         }
         
         

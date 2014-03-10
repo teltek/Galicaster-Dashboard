@@ -410,8 +410,7 @@ panel.html.agents = function ( name, isOdd ) {
             // Free space
             var freeHdObject = getObjects ( v.properties, "key", "capture.cleaner.mindiskspace" );
             if ( freeHdObject.length > 0 ) {
-                //freeHdHtml = ( parseInt( freeHdObject[ 0 ].value ) / 1048576 ) + ' MB';
-                freeHdHtml = Math.round(100 + Math.random() * 10000) + ' MB';
+                freeHdHtml = humanFileSize( freeHdObject[ 0 ].value );
             }
             
             // State (check if agent is offline) & time
