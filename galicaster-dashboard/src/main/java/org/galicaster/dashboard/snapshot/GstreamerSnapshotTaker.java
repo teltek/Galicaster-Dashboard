@@ -1,3 +1,7 @@
+/**
+ * TODO add license
+ */
+
 package org.galicaster.dashboard.snapshot;
 
 import org.opencastproject.capture.admin.api.Agent;

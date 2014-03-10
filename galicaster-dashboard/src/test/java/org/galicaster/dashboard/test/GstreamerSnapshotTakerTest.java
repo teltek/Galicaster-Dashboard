@@ -1,3 +1,7 @@
+/**
+ * TODO add license
+ */
+
 package org.galicaster.dashboard.test;
 
 import junit.framework.Assert;

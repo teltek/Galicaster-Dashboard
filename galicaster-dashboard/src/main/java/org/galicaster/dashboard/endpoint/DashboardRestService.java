@@ -1,3 +1,7 @@
+/**
+ * TODO add license
+ */
+
 package org.galicaster.dashboard.endpoint;
 
 import org.opencastproject.util.NotFoundException;
