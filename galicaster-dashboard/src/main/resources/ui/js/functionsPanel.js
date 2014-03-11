@@ -44,8 +44,9 @@ function getBase64FromImageUrl(URL) {
     };
 }
 
-getBase64FromImageUrl( '/dashboard/resources/off.png' );
+//getBase64FromImageUrl( '/dashboard/resources/off.png' );
 //panel.preCacheImgOff = getBase64FromImageUrl( '/dashboard/resources/off.png' );
+panel.preCacheImgOff = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAFoCAYAAADHMkpRAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QQYDTQbO87VqQAABpxJREFUeNrt1kEBACAAhLDT/gVsaxC2CLw4294AAMi4EgAAtBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMQYQACDGAAIAxBhAAIAYAwgAEGMAAQBiDCAAQIwBBACIMYAAADEGEAAgxgACAMQYQACAGAMIABBjAAEAYgwgAECMAQQAiDGAAAAxBhAAIMYAAgDEGEAAgBgDCAAQYwABAGIMIABAjAEEAIgxgAAAMR+YLANpVtV3WwAAAABJRU5ErkJggg%3D%3D';
 
 panel.loadAgents = function () {
     $.ajax({
@@ -60,6 +61,21 @@ panel.loadAgents = function () {
         
         
     });
+};
+
+
+panel.loadAgentsSync = function () {
+    $.ajax({
+	    url:    '/capture-admin/agents.json',
+	    async: false,
+	    success: function ( data ) {
+		$.each( process_mh_array_response( data.agents.agent ), function ( i, v ){
+			panel.agents[ v.name ] = v;
+			panel.agents[ v.name ].preCacheImg = panel.preCacheImgOff;
+		});
+		$.publish( 'dashboard/reloadall' );
+	    } });
+
 };
 
 
@@ -355,19 +371,7 @@ panel.html.agents = function ( name, isOdd ) {
         }
 
         
-        var imageSrc = "";
-        
-        /*
-        if ( stateAgent === "offline" ) {
-           imageURL = 'resources/off.png';
-        } else {
-           //imageURL = '/dashboard/rest/agents/' + name + '/snapshot.png';
-           imageURL = 'http://admin.matterhorn.campusdomar.es/dashboard/rest/agents/' + name + '/snapshot.png';
-           //imageURL = 'http://172.20.209.225/dashboard_galicaster/' + name + '.png';
-        }*/
-   
-
-            imageSrc = panel.agents[ v.name ].preCacheImg;
+        var imageSrc = panel.agents[ v.name ].preCacheImg || panel.preCacheImgOff;
         
         htmlAgent = 
             '<div class="dashboardItemContainer" id="' + v.name + '" style="opacity: ' + opacity  + '; display: ' + display + '; width: ' + panel.html.actualSize + 'px; height: ' + panel.html.actualSize + 'px; float: left;">' + 
@@ -906,7 +910,7 @@ function getArrayStatusNextRecording( strdate ) {
 
 function init() {
     panel.html.loadStyle();
-    panel.loadAgents();
+    panel.loadAgentsSync();
 
 }
 
@@ -961,25 +965,21 @@ function precacheImages() {
             img.src = urlImg;
         }
             
-            
-        
-
-
-        //precacheImg.src = 'http://admin.matterhorn.campusdomar.es/dashboard/rest/agents/' + name  + '/snapshot.png';
-        //precacheImg.src = '/dashboard/rest/agents/' + name + '/snapshot.png';
     });  
 }
 
 $( document ).ready( function(){ 
-    init();
+	init();
     
-    setInterval(function() { if($('#autoRefreshButton').is(':checked')) {$.publish( 'dashboard/reloadall' );}}, 1000 * 10 * 1);
-    setTimeout(  setInterval(function() { if($('#autoRefreshButton').is(':checked')) { precacheImages(); }}, 1000 * 10 * 1), 1000 * 10 * 0.5 );
+	setInterval(function() { 
+		if($('#autoRefreshButton').is(':checked')) {
+		    precacheImages();
+		    $.publish( 'dashboard/reloadall' );
+		}
+	    }, 1000 * 10 * 1);
 
-    // PETICION PARA EVITAR EL DESLOGUEO, NECESARIO EN LA VERSION 1.2-uvigo
-    setInterval(function() {$.get('/info/me.json');}, 1000 * 60 * 1);
-    
-      
+	//setTimeout(  setInterval(function() { if($('#autoRefreshButton').is(':checked')) { precacheImages(); }}, 1000 * 10 * 1), 1000 * 10 * 0.5 );
+
 
         // calendar icon
         $( ".goToCalendar a img").hover( function() {
