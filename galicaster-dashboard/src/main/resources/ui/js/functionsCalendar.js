@@ -754,8 +754,7 @@ function init_calendar() {
                             data        :   payload,
                             url         :   '/recordings'
                         }).done(function (data2, status, xhr) { 
-                            // extracts id from response header 
-                            // (ex: http://matterhorn.uvigo.es/recordings/5947979798.xml )
+
                             var str = xhr.getResponseHeader("Location");
                             var myRegexp = /.*\/(\d+).xml/;
                             var match = myRegexp.exec( str );
@@ -935,8 +934,5 @@ $( document ).ready( function() {
        filtrar_por_agents();
     });
     init(); // ejecutar al inicio
-
-    // PETICION PARA EVITAR EL DESLOGUEO, NECESARIO EN LA VERSION 1.2-uvigo
-    setInterval(function() {$.get('/info/me.json');}, 1000 * 60 * 0.5);
 });
 
