@@ -267,14 +267,19 @@ edit.loadValues = function() {
                     }
                 });
 
+		scheduleTags = ['schedule'];
+
                 var htmlComboProcessing = '<select id="comboProcessing">';
                 $.each( edit.old.allProcessing(), function (i, v) {
 
-                    if ( v.id === "error") { return; }
+		    var wTags = process_mh_array_response(v.tags.tag);
+		    var isSchedule = false;
 
-                    if ( v.tag !== undefined && tags !== undefined && $.isArray( tags )) {
-                        if( $.inArray( v.tag, tags ) === -1 ) { return; } 
-                    }
+		    for(i=0; i < wTags.length; i++) {
+			if( $.inArray( wTags[i], scheduleTags ) !== -1 ) { isSchedule = true } 
+		    }
+
+		    if(!isSchedule) return;
 
                     var optionSelected = "";
                     if ( v.id === comboProcessingSelected ) { optionSelected = ' selected="selected" '; }
@@ -1801,7 +1806,4 @@ $( document ).ready( function () {
          }
          
      });
-
-    // PETICION PARA EVITAR EL DESLOGUEO, NECESARIO EN LA VERSION 1.2-uvigo
-    //setInterval(function() {$.get('/info/me.json');}, 1000 * 60 * 0.5);
 });
