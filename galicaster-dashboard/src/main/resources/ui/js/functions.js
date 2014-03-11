@@ -24,12 +24,11 @@ function getUrlVars() {
 
 //TODO change name function and add in lib
 function process_mh_array_response( res ) {
-    if (res === undefined){
-        return [];
-    } else if (res.length === undefined){
-        return [res];
-    } else {
+    if (res === undefined) return [];
+    if ($.isArray(res)) {
 	return res;
+    } else {
+	return [res];
     }
 }
 
@@ -158,6 +157,7 @@ function parseMsToDate( ms, type, delimiter ) {
     }
     return dateStr;
 }
+
 
 function humanFileSize(bytes, si) {
     var thresh = si ? 1000 : 1024;
