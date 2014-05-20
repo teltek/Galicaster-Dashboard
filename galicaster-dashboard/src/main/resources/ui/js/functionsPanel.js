@@ -381,7 +381,7 @@ panel.html.agents = function ( name, isOdd ) {
                 '<div class="dashboardItem statusText ' + stateAgent + '" id="statusText_' + v.name + '" style="font-size: ' + panel.html.actualFontSize + 'px;">' + stateAgent + '</div>' + 
                 '<div class="dashboardItem info name"   style="font-size: ' + panel.html.actualFontSize + 'px;">' + v.name + '</div>' + 
                 '<div class="dashboardItem infoButton"  style="font-size: 24px;">i</div>' +
-                '<div class="dashboardItem hideButton ' + show_or_hide + '"     title="Ocultar agente. Para volver a mostrar desplegar la barra lateral y seleccionar &quot;ver agentes ocultos&quot;, y luego pulsra el botón mostrar del agente" style="font-size: 31px;"></div>' +
+                '<div class="dashboardItem hideButton ' + show_or_hide + '"     title="Ocultar agente. Para volver a mostrar desplegar la barra lateral y seleccionar &quot;ver agentes ocultos&quot;, y luego pulsar el botón mostrar del agente" style="font-size: 31px;"></div>' +
                 '<a class="vncLink" href="vnc.html?host=' + v.url + '"><div class="dashboardItem vncButton" style="font-size: 31px;"></div></a>' +
                 '<a href="calendar.html?agent=' + v.name + '"><div class="dashboardItem calendarButton" style="font-size: 31px;"></div></a>' +
             '</div>';
