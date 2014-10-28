@@ -18,7 +18,7 @@ import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -259,7 +259,7 @@ public class DashboardService {
 
       DefaultOrganization defaultOrg = new DefaultOrganization();
       securityService.setOrganization(defaultOrg);
-      securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
+      securityService.setUser(new JaxbUser(systemAccount, defaultOrg, new String[] { GLOBAL_ADMIN_ROLE }));
       
       // Start the threads that take the snapshots
       periodicSnapshots = Executors.newScheduledThreadPool(maxConcurrentSnapshots);
