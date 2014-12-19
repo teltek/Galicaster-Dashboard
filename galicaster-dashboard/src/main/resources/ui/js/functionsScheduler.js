@@ -1259,7 +1259,7 @@ edit.html.loadValues = function () {
     
     //date
     var temporal_hours = Math.floor(edit.old.duration() / 3600000);
-    var temporal_minutes = Math.round((edit.old.duration() % 3600) / 60);
+    var temporal_minutes = Math.round((edit.old.duration() / 60000) % 60);
     var temporal_hours_formatted    = ("0" + temporal_hours).slice(-2);
     var temporal_minutes_formatted  = ("0" + temporal_minutes).slice(-2);
     $( '#duration input[type=text]' ).val( temporal_hours_formatted +":"+temporal_minutes_formatted );
