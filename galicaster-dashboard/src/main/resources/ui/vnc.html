@@ -23,9 +23,10 @@
         function connect(){
             var vars = getUrlVars();
             host = vars["host"];
-            document.write('Connecting with '+host+'...<br><br>NOTE: The connection will be closed if you close the window!!');
+            document.write('Connecting with '+host+'...<br>');
+            document.write('Java Runtime Environment is needed to run Applet.<br><br>');
+            document.write('NOTE: The connection will be closed if you close the window!!');
             document.write('<applet archive="jar/tightvnc-jviewer.jar" code="com.glavsoft.viewer.Viewer" width="1" height="1"><param name="Host" value="' + host + '" />');
-
             document.write('</applet>');
         }
     </script>                
